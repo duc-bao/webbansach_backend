@@ -3,6 +3,7 @@ package vn.ducbao.springboot.webbansach_backend.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.sql.Date;
 import java.util.List;
 
 @Data
@@ -21,16 +22,24 @@ public class User {
     private String userName;
     @Column(name = "password", length = 512)
     private String password;
-    @Column(name = "sex")
-    private String sex;
+    @Column(name = "date_of_birth")
+    private Date dateOfBirth;
+    @Column(name = "gender")
+    private String gender;
     @Column(name = "email")
     private String email;
-    @Column(name = "phone")
-    private String phone;
+    @Column(name = "phone_number")
+    private String phoneNumber;
     @Column(name = "purchase_address")
     private String purchaseAdrress;
     @Column(name = "delivery_address")
     private String deliveryAdress;
+    @Column(name = "avatar")
+    private String avatar; // Ảnh đại diện
+    @Column(name = "enabled")
+    private boolean enabled; // Trạng thái kích hoạt
+    @Column(name = "activation_code")
+    private String activationCode; // Mã kích hoạt
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = {CascadeType.DETACH, CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     List<Review> reviewList;
     @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH}, fetch = FetchType.LAZY)

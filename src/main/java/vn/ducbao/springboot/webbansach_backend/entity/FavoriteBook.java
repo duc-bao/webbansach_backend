@@ -9,7 +9,7 @@ import lombok.Data;
 public class FavoriteBook {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_favorites")
+    @Column(name = "id_favorites_book")
     private int id_favorite;
     @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinColumn(name = "id_user", nullable = false)

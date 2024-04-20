@@ -14,7 +14,7 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_order")
     private int idOrder;
-    @Column(name = "date_order")
+    @Column(name = "date_created")
     private Date dateOrder;
     @Column(name = "purchase_address")
     private String purchaseAddress;
@@ -24,6 +24,14 @@ public class Order {
     private double totalPriceProduct;
     @Column(name = "fee_payment")
     private double feePayment;
+    @Column(name = "status")
+    private String status;
+    @Column(name = "note")
+    private String note;
+    @Column(name = "phone_number")
+    private  String phoneNumber;
+    @Column(name = "full_name")
+    private String fullName;
     @Column(name = "fee_delivery")
     private double feeDelivery;
     @Column(name = "total_price")

@@ -15,8 +15,8 @@ public class Book {
     private int idBook;
     @Column(name = "name_book", length = 256)
     private String name;
-    @Column(name = "cost_book")
-    private String cost;
+//    @Column(name = "cost_book")
+//    private String cost;
     @Column(name = "author", length = 512)
     private String  author;
     @Column(name = "isbn", length = 256)
@@ -27,10 +27,14 @@ public class Book {
     private  double sellPrice;
     @Column(name = "quantity")
     int quantity;
+    @Column(name = "description")
+    private  String description;
     @Column(name = "avg_rating")
     private double avgRating;
     @Column(name = "sold_quantity")
     private  int soldQuantity;
+    @Column(name = "discount_percent")
+    private double discountPercent;
     @ManyToMany(fetch = FetchType.LAZY, cascade = {
             CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH
     })

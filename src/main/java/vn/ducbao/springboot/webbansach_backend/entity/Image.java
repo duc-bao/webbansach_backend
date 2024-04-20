@@ -11,13 +11,13 @@ public class Image {
    @GeneratedValue(strategy = GenerationType.IDENTITY)
    @Column(name = "id_image")
    private int idImgage;
-   @Column(name = "name_img", length = 256)
+   @Column(name = "name_image", length = 256)
    private String nameIma;
-   @Column(name = "icon")
+   @Column(name = "is_thumbnail")
    private boolean icon;
-   @Column(name = "link_img", length = 512)
+   @Column(name = "url_image", length = 512)
    private String linkImg;
-   @Column(name = "date_img", length = 256)
+   @Column(name = "data_image", length = 256)
    @Lob
    private String dataImg;
    @ManyToOne(

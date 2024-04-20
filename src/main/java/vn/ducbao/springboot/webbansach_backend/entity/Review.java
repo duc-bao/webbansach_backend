@@ -19,10 +19,10 @@ public class Review {
     @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.PERSIST, CascadeType.MERGE,CascadeType.REFRESH})
     @JoinColumn(name = "id_book", nullable = false)
     private Book book;
-    @Column(name = "comment")
+    @Column(name = "content")
     private String comment;
-    @Column(name = "rating_points")
-    private  double ratingPoints;
-    @Column(name = "date_created")
+    @Column(name = "rating_point")
+    private  double ratingPoint;
+    @Column(name = "timestamp")
     private Date dateCreated;
 }
