@@ -10,14 +10,14 @@ public class Image {
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
    @Column(name = "id_image")
-   private int idImgage;
+   private int idImage;
    @Column(name = "name_image", length = 256)
-   private String nameIma;
+   private String nameImg;
    @Column(name = "is_thumbnail")
    private boolean icon;
    @Column(name = "url_image", length = 512)
    private String linkImg;
-   @Column(name = "data_image", length = 256)
+   @Column(name = "data_image", columnDefinition = "LONGTEXT")
    @Lob
    private String dataImg;
    @ManyToOne(

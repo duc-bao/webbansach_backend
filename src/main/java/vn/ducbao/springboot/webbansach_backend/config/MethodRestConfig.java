@@ -13,13 +13,16 @@ import vn.ducbao.springboot.webbansach_backend.entity.User;
 
 @Configuration
 public class MethodRestConfig implements RepositoryRestConfigurer {
-    private String url = "http://localhost:8080";
+    private String url = "http://localhost:3000";
     @Autowired
     private EntityManager entityManager;
     @Override
     public void configureRepositoryRestConfiguration(RepositoryRestConfiguration config, CorsRegistry cors) {
         // Cấu hình thêm là cho phép trả về id của entity khi gọi endpoint get
         config.exposeIdsFor(entityManager.getMetamodel().getEntities().stream().map(Type::getJavaType).toArray(Class[]::new));
+
+        //CORS Configuration
+        cors.addMapping("/**").allowedOrigins(url).allowedMethods("GET", "PUT", "POST", "DELETE");
 
         //Chặn các phương thức nào khác phương thức get chặn tất cả
         HttpMethod[] disableMethod = {
