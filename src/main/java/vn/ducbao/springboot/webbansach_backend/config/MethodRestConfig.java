@@ -16,6 +16,7 @@ public class MethodRestConfig implements RepositoryRestConfigurer {
     private String url = "http://localhost:3000";
     @Autowired
     private EntityManager entityManager;
+
     @Override
     public void configureRepositoryRestConfiguration(RepositoryRestConfiguration config, CorsRegistry cors) {
         // Cấu hình thêm là cho phép trả về id của entity khi gọi endpoint get
@@ -25,12 +26,12 @@ public class MethodRestConfig implements RepositoryRestConfigurer {
         cors.addMapping("/**").allowedOrigins(url).allowedMethods("GET", "PUT", "POST", "DELETE");
 
         //Chặn các phương thức nào khác phương thức get chặn tất cả
-        HttpMethod[] disableMethod = {
-                HttpMethod.POST,
-                HttpMethod.PUT,
-                HttpMethod.DELETE,
-                HttpMethod.PATCH
-        };
+//        HttpMethod[] disableMethod = {
+//                HttpMethod.POST,
+//                HttpMethod.PUT,
+//                HttpMethod.DELETE,
+//                HttpMethod.PATCH
+//        };
 
 //        //Chặn các phương thức của class entity cụ thể
 //        disableHttpMethod(Category.class, config, disableMethod);
@@ -40,8 +41,9 @@ public class MethodRestConfig implements RepositoryRestConfigurer {
 //        };
 //        disableHttpMethod(User.class, config, disableMethodUser);
     }
+
     // CHặn riêng lẻ từng class một với các phương thức http riêng lẻ
-    private  void disableHttpMethod(Class c, RepositoryRestConfiguration configurer,HttpMethod[] httpMethods){
+    private void disableHttpMethod(Class c, RepositoryRestConfiguration configurer, HttpMethod[] httpMethods) {
         configurer.getExposureConfiguration().forDomainType(c)
                 .withItemExposure(((metdata, httpMethods1) -> httpMethods1.disable(httpMethods)))
                 .withCollectionExposure((metdata, httpMethods1) -> httpMethods1.disable(httpMethods));

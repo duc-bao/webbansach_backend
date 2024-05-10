@@ -6,7 +6,8 @@ import org.springframework.stereotype.Repository;
 import vn.ducbao.springboot.webbansach_backend.entity.User;
 @RepositoryRestResource(path = "users")
 public interface UserRepository extends JpaRepository<User, Integer> {
-    public boolean existsByUserName(String userName);
-     public boolean existsByEmail (String email);
-    public User findByUserName(String userName);
+    public boolean existsByUsername(String username);
+    public boolean existsByEmail (String email);
+    public User findByUsername(String username);
+    public User findByEmail(String email);
 }

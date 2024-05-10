@@ -23,9 +23,11 @@ import java.util.stream.Collectors;
 public class UserSeviceImpl implements UserService {
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
+    @Autowired
     private UserRepository userRepository;
     @Autowired
     private EmailService emailService;
+    @Autowired
     private RoleRepository roleRepository;
 
     @Autowired
@@ -36,22 +38,22 @@ public class UserSeviceImpl implements UserService {
 
     @Override
     public ResponseEntity<?> register(User user) {
-        if (userRepository.existsByUserName(user.getUserName())) {
-            return ResponseEntity.badRequest().body(new Notification("Username đã tồn tại"));
+        if (userRepository.existsByUsername(user.getUsername())) {
+            return ResponseEntity.badRequest().body(new Notification("Username đã tồn tại!"));
         }
         if (userRepository.existsByEmail((user.getEmail()))) {
-            return ResponseEntity.badRequest().body(new Notification("Email đã tồn tại"));
+            return ResponseEntity.badRequest().body(new Notification("Email đã tồn tại!"));
         }
         // Gán và gửi thông tin kích hoạt
         user.setActivationCode(activationCode());
         user.setEnabled(false);
         // Ma hoa mat khau
         String endecodePassword = bCryptPasswordEncoder.encode(user.getPassword());
+        System.out.println(user.getUsername());
         user.setPassword(endecodePassword);
         userRepository.save(user);
         sendEmailUser(user.getEmail(), user.getActivationCode());
         return ResponseEntity.ok("Tạo thành công");
-
     }
 
     // Tạo mã kích hoạt
@@ -68,18 +70,18 @@ public class UserSeviceImpl implements UserService {
 
     @Override
     public User findByUserName(String userName) {
-        return userRepository.findByUserName(userName);
+        return userRepository.findByUsername(userName);
     }
 
     // Lấy ra các thông tin của user đó để xét quyền
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUserName(username);
+        User user = userRepository.findByUsername(username);
         if (user == null) {
             throw new UsernameNotFoundException("Tai khoan khong ton tai!");
         }
         org.springframework.security.core.userdetails.User user1 =
-                new org.springframework.security.core.userdetails.User(user.getUserName(), user.getPassword(), roleToAuthorities(user.getRoleList()));
+                new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), roleToAuthorities(user.getRoleList()));
 
         return user1;
     }

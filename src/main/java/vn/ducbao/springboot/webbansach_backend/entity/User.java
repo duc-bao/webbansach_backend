@@ -16,10 +16,10 @@ public class User {
     private int idUser;
     @Column(name = "first_name", length = 256)
     private String firstName;
-    @Column(name = "last_name")
+    @Column(name = "last_name", length = 256)
     private String lastName;
-    @Column(name = "username")
-    private String userName;
+    @Column(name = "username", length = 256)
+    private String username;
     @Column(name = "password", length = 512)
     private String password;
     @Column(name = "date_of_birth")
@@ -40,26 +40,27 @@ public class User {
     private boolean enabled; // Trạng thái kích hoạt
     @Column(name = "activation_code")
     private String activationCode; // Mã kích hoạt
-
-    public boolean isEnabled() {
-        return enabled;
+    @Override
+    public String toString() {
+        return "User{" +
+                "idUser=" + idUser +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", username='" + username + '\'' +
+                ", password='" + password + '\'' +
+                ", gender=" + gender +
+                ", dateOfBirth=" + dateOfBirth +
+                ", email='" + email + '\'' +
+                ", phoneNumber='" + phoneNumber + '\'' +
+                ", deliveryAddress='" + deliveryAdress + '\'' +
+                ", avatar='" + avatar + '\'' +
+                ", enabled=" + enabled +
+                ", activationCode='" + activationCode + '\'' +
+                '}';
     }
-
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
-    }
-
-    public String getActivationCode() {
-        return activationCode;
-    }
-
-    public void setActivationCode(String activationCode) {
-        this.activationCode = activationCode;
-    }
-
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = {CascadeType.DETACH, CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     List<Review> reviewList;
-    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH}, fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER,cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinTable(name = "user_role",
             joinColumns = @JoinColumn(name = "id_user"),
             inverseJoinColumns = @JoinColumn(name = "id_role"))

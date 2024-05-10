@@ -12,9 +12,7 @@ import vn.ducbao.springboot.webbansach_backend.service.user.UserSeviceImpl;
 @RequestMapping("/user")
 public class UserController {
     @Autowired
-    private UserSeviceImpl userSevice;
-    
-    @CrossOrigin(origins = "http://localhost:3000")//cho phep request tu fe
+    private UserService userSevice;
     @PostMapping("/register")
     public ResponseEntity<?> register(@Validated @RequestBody User user){
         ResponseEntity<?> response = userSevice.register(user);
