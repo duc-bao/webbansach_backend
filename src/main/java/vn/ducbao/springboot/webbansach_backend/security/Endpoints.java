@@ -13,7 +13,8 @@ public class Endpoints {
             "/user/active-account/**",
     };
     public  static  final String[] PUBLIC_POST_ENDPOINT = {
-            "/user/register"
+            "/user/register",
+            "/user/login"
     };
     public  static  final  String[] ADMIN_ENDPOINT = {
             "/user",

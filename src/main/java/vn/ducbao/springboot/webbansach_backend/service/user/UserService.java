@@ -7,4 +7,5 @@ import vn.ducbao.springboot.webbansach_backend.entity.User;
 public interface UserService extends UserDetailsService {
     public ResponseEntity<?> register(User user);
     public User findByUserName(String userName);
+    public ResponseEntity<?> activeUser(String email, String activeCode);
 }

@@ -65,9 +65,30 @@ public class UserSeviceImpl implements UserService {
     private void sendEmailUser(String email, String activationCode) {
         String subject = "Kich hoạt tài khoản của bạn tại web bán sách";
         String text = "Vui lòng sử dụng mã sau để kích hoạt cho tài khoản <" + email + ">:<br> <h1>" + activationCode + "</h1>";
+        text += "<br>Click Vào đường link để kích hoạt tài khoản:";
+        String url = "http:localhost:3000/active-account/"+email+ "/"+activationCode;
+        text += ("<br><a href = "+url+"> "+url+" </a>");
         emailService.sendMessage("truongducbao29042002@gmail.com", email, subject, text);
     }
+    //Kích hoạt tài khoản người dùng
+    public  ResponseEntity<?> activeUser(String email, String activationCode){
+        User user = userRepository.findByEmail(email);
+        if(user == null){
+          return   ResponseEntity.badRequest().body(new Notification("Người dùng không tồn tại"));
+        }
+        if(user.isEnabled()){
+          return   ResponseEntity.badRequest().body(new Notification("Người dùng đã kích hoạt tài khoản"));
+        }
+        if(activationCode.equals(user.getActivationCode())){
+            user.setEnabled(true);
+            System.out.println(user.isEnabled());
+            userRepository.save(user);
+           return ResponseEntity.badRequest().body(new Notification("Kích hoạt tài khoản thành công"));
+        }else{
+           return ResponseEntity.badRequest().body(new Notification("Mã kích hoạt nhập không chính xác"));
+        }
 
+    }
     @Override
     public User findByUserName(String userName) {
         return userRepository.findByUsername(userName);
