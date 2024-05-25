@@ -10,16 +10,22 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import vn.ducbao.springboot.webbansach_backend.entity.User;
+import vn.ducbao.springboot.webbansach_backend.service.jwt.JwtFilter;
 import vn.ducbao.springboot.webbansach_backend.service.user.UserService;
 
 import java.util.Arrays;
 
 @Configuration
 public class SecurityConfiguration {
+    @Autowired
+    private JwtFilter auFilter;
+
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -27,6 +33,7 @@ public class SecurityConfiguration {
 
     // Này để cấu hình xem security sẽ làm những gì
     @Bean
+    @Autowired
     public DaoAuthenticationProvider authenticationProvider(UserService userService) {
         DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
         daoAuthenticationProvider.setUserDetailsService(userService);
@@ -41,7 +48,10 @@ public class SecurityConfiguration {
                 config -> config
                         .requestMatchers(HttpMethod.GET, Endpoints.PUBLIC_GET_ENDPOINT).permitAll()
                         .requestMatchers(HttpMethod.POST, Endpoints.PUBLIC_POST_ENDPOINT).permitAll()
-                      .requestMatchers(HttpMethod.GET, Endpoints.ADMIN_ENDPOINT).hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.GET, Endpoints.ADMIN_ENDPOINT).hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.POST, Endpoints.ADMIN_POST_ENDPOINT).hasAuthority("ADMIN")
+//                        .requestMatchers(HttpMethod.PUT, Endpoints.ADMIN_ENDPOINT).hasAuthority("ADMIN")
+//                        .requestMatchers(HttpMethod.DELETE, Endpoints.ADMIN_ENDPOINT).hasAuthority("ADMIN")
         );
         // Cấu hình cors
         http.cors(cors -> {
@@ -53,6 +63,10 @@ public class SecurityConfiguration {
                 return corsConfig;
             });
         });
+        // Thêm lọc trước khi thêm vào
+        http.addFilterBefore(auFilter, UsernamePasswordAuthenticationFilter.class);
+        // Cấu hình session không lưu trữ trạng thái
+        http.sessionManagement((seesion) -> seesion.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         http.httpBasic(Customizer.withDefaults());
         http.csrf(AbstractHttpConfigurer::disable);
 
@@ -61,7 +75,7 @@ public class SecurityConfiguration {
 
     //Tạo authentication để JWT có thể quản lí
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception{
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
 

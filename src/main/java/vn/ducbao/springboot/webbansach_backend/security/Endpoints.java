@@ -16,8 +16,13 @@ public class Endpoints {
             "/user/register",
             "/user/login"
     };
+
     public  static  final  String[] ADMIN_ENDPOINT = {
             "/user",
-            "/users/**"
+            "/users/**",
+            "/**"
+    };
+    public static final String[] ADMIN_POST_ENDPOINT = {
+            "/book/add-book/**",
     };
 }
