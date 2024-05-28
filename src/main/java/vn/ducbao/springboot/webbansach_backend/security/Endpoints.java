@@ -8,6 +8,7 @@ public class Endpoints {
             "/images",
             "/images/**",
             "/categories",
+            "/categories/**",
             "/users/search/existsByUsername/**",
             "/users/search/existsByEmail/**",
             "/user/active-account/**",
