@@ -9,21 +9,32 @@ public class Endpoints {
             "/images/**",
             "/categories",
             "/categories/**",
+            "/orders/**",
             "/users/search/existsByUsername/**",
             "/users/search/existsByEmail/**",
             "/user/active-account/**",
+
     };
     public  static  final String[] PUBLIC_POST_ENDPOINT = {
             "/user/register",
-            "/user/login"
+            "/user/login",
     };
 
     public  static  final  String[] ADMIN_ENDPOINT = {
-            "/user",
-            "/users/**",
-            "/**"
-    };
-    public static final String[] ADMIN_POST_ENDPOINT = {
+
+            "/cart-items/**",
+            "/books",
+            "/books/**",
             "/book/add-book/**",
+            "/user/add-user/**",
+            "/orders/**",
+            "/order/**",
+            "/order-detail/**",
+            "/roles/**",
+            "/users",
+            "/users/**",
+            "/book/get-total/**",
+            "/**",
     };
+
 }

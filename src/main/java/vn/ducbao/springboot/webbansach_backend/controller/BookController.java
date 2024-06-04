@@ -25,5 +25,16 @@ public class BookController {
             return  ResponseEntity.badRequest().build();
         }
     }
+    @PostMapping(path = "update-book")
+    public ResponseEntity<?> update(@RequestBody JsonNode jsonNode){
+        try{
+            return bookService.update(jsonNode);
+        }catch (Exception e){
+            e.printStackTrace();
+            System.out.println("loi");
+            return  ResponseEntity.badRequest().build();
+        }
+    }
+
 
 }

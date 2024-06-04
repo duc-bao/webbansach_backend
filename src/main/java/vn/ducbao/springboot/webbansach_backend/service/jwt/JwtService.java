@@ -36,8 +36,8 @@ public class JwtService {
         claims.put("avatar", user.getAvatar());
         claims.put("lastName", user.getLastName());
         claims.put("enabled", user.isEnabled());
+        List<Role> list = user.getRoleList();
         if (user != null && user.getRoleList().size() >= 0) {
-            List<Role> list = user.getRoleList();
             for (Role r : list
             ) {
                 if(r.getNameRole().equals("ADMIN")){
@@ -64,7 +64,7 @@ public class JwtService {
                 .setClaims(claims)
                 .setSubject(username)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 30 * 60 * 1000)) //JWT hết hạn sau 30p
+                .setExpiration(new Date(System.currentTimeMillis() +  100000L * 60 * 60 * 1000)) //JWT hết hạn sau 30p
                 .signWith(SignatureAlgorithm.HS256, getSignKey())
                 .compact();
     }

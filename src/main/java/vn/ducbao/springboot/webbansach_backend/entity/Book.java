@@ -52,4 +52,26 @@ public class Book {
     List<Review> reviewList;
     @OneToMany(mappedBy = "book", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     List<FavoriteBook> favoriteBookList;
+
+    @Override
+    public String toString() {
+        return "Book{" +
+                "idBook=" + idBook +
+                ", name='" + name + '\'' +
+                ", author='" + author + '\'' +
+                ", ISBN='" + ISBN + '\'' +
+                ", listPrice=" + listPrice +
+                ", sellPrice=" + sellPrice +
+                ", quantity=" + quantity +
+                ", description='" + description + '\'' +
+                ", avgRating=" + avgRating +
+                ", soldQuantity=" + soldQuantity +
+                ", discountPercent=" + discountPercent +
+                ", categoryList=" + categoryList +
+                ", imageList=" + imageList +
+                ", orderDetailList=" + orderDetailList +
+                ", reviewList=" + reviewList +
+                ", favoriteBookList=" + favoriteBookList +
+                '}';
+    }
 }

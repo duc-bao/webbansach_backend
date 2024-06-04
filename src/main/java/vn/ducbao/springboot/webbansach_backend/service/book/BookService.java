@@ -6,4 +6,5 @@ import org.springframework.http.ResponseEntity;
 
 public interface BookService {
     public ResponseEntity<?> save(JsonNode jsonNode) throws JsonProcessingException;
+    public ResponseEntity<?> update(JsonNode jsonNode) throws  JsonProcessingException;
 }
