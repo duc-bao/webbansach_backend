@@ -13,26 +13,27 @@ public class Endpoints {
             "/users/search/existsByUsername/**",
             "/users/search/existsByEmail/**",
             "/user/active-account/**",
-
+            "/roles/**",
+            "/users",
+            "/users/**",
+            "/order/**",
+            "/order-detail/**",
+            "/orders/**",
+            "/cart-items/**",
     };
     public  static  final String[] PUBLIC_POST_ENDPOINT = {
             "/user/register",
             "/user/login",
+            "/book/add-book/**",
+    };
+    public  static  final String [] PUBLIC_DELETE_ENDPOINT ={
+            "/books",
+            "/books/**",
     };
 
     public  static  final  String[] ADMIN_ENDPOINT = {
 
-            "/cart-items/**",
-            "/books",
-            "/books/**",
-            "/book/add-book/**",
             "/user/add-user/**",
-            "/orders/**",
-            "/order/**",
-            "/order-detail/**",
-            "/roles/**",
-            "/users",
-            "/users/**",
             "/book/get-total/**",
             "/**",
     };

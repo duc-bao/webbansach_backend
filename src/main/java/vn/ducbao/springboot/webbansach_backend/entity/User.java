@@ -69,4 +69,6 @@ public class User {
     List<Order> orderList;
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = {CascadeType.DETACH, CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     List<FavoriteBook> favoriteBookList;
+    @OneToMany(mappedBy = "user",fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<CartItem> listCartItems;
 }
