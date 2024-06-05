@@ -12,6 +12,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import vn.ducbao.springboot.webbansach_backend.service.UserSecurityService;
 import vn.ducbao.springboot.webbansach_backend.service.user.UserService;
 
 import java.io.IOException;
@@ -20,8 +21,7 @@ public class JwtFilter extends OncePerRequestFilter {
     @Autowired
     private JwtService jwtService;
     @Autowired
-    @Lazy
-    private UserService userService;
+    private UserSecurityService userService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -31,12 +31,15 @@ public class JwtFilter extends OncePerRequestFilter {
         // lấy token người dùng truyền vào và lấy username dựa trên token đó
         if(authHeader!= null && authHeader.startsWith("Bearer ")){
             token = authHeader.substring(7);
+            System.out.println("Token: " + token);
             username = jwtService.extractUsername(token);
+            System.out.println("Username: " + username);
         }
         // ==> Từ chuỗi token lấy được chúng ta thêm người dùng vào cái request đó
         // Kiểm tra xem user có tồn tại và đã đăng nhập hay chưa
-        if(username != null && SecurityContextHolder.getContext().getAuthentication()!= null){
+        if(username != null && SecurityContextHolder.getContext().getAuthentication()== null){
             UserDetails userDetails = userService.loadUserByUsername(username);
+            System.out.println("UserDetails: " + userDetails);
             // Kiểm tra tính hợp lệ của token
             if(jwtService.validateToken(token, userDetails)){
                 // Tạo user với cái quyền của nó

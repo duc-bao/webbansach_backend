@@ -1,11 +1,13 @@
 package vn.ducbao.springboot.webbansach_backend.controller;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.parameters.P;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import vn.ducbao.springboot.webbansach_backend.entity.Notification;
@@ -52,6 +54,26 @@ public class UserController {
             return  ResponseEntity.badRequest().body(new Notification("Tên đăng nhập mật khẩu không chính xác"));
         }
         return  ResponseEntity.badRequest().body(new Notification("Xác thực không thành công"));
+    }
+
+    @PutMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestBody JsonNode jsonNode){
+        try {
+            return  userSevice.forgotPassword(jsonNode);
+        }catch (Exception e){
+            e.printStackTrace();
+            return  ResponseEntity.badRequest().build();
+        }
+    }
+    @PutMapping("/change-password")
+    public ResponseEntity<?> changePassword(@RequestBody JsonNode jsonNode){
+        System.out.println(jsonNode);
+        try {
+            return  userSevice.changePassword(jsonNode);
+        }catch (Exception e){
+            e.printStackTrace();
+            return   ResponseEntity.badRequest().build();
+        }
     }
 
 }

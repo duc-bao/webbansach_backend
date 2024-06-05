@@ -1,5 +1,7 @@
 package vn.ducbao.springboot.webbansach_backend.service.user;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.GrantedAuthority;
@@ -16,6 +18,7 @@ import vn.ducbao.springboot.webbansach_backend.entity.User;
 import vn.ducbao.springboot.webbansach_backend.service.email.EmailService;
 
 import java.util.Collection;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -56,6 +59,8 @@ public class UserSeviceImpl implements UserService {
         return ResponseEntity.ok("Tạo thành công");
     }
 
+
+
     // Tạo mã kích hoạt
     private String activationCode() {
         return UUID.randomUUID().toString();
@@ -89,28 +94,88 @@ public class UserSeviceImpl implements UserService {
         }
 
     }
+
+    // Forgot-password
+    public ResponseEntity<?> forgotPassword(JsonNode jsonNode){
+        try {
+            User user = userRepository.findByEmail(formatStringByJson(String.valueOf(jsonNode.get("email").toString())));
+            if(user == null){
+                return ResponseEntity.notFound().build();
+            }
+            // Doi mat khau cho user
+            String passwordTemp = generateTemporaryPassword();
+            user.setPassword(bCryptPasswordEncoder.encode(passwordTemp));
+            userRepository.save(user);
+
+            // Gui email de nhan mat khau
+
+            sendEmailForgotPassword(user.getEmail(), passwordTemp);
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return ResponseEntity.ok().build();
+    }
+
+    private ResponseEntity<?> sendEmailForgotPassword(String email, String passwordTemp) {
+        String subject = "Reset mật khẩu";
+        String text = "Mật khẩu tạm thời của bạn là: <strong>" + passwordTemp + " </strong>";
+        text += "<br/>  <span>Vui lòng đăng nhập và đổi lại mật khẩu của bạn</span>";
+        try {
+            emailService.sendMessage("truongducbao290402@gmail.com", email, subject,text);
+        }catch (Exception e){
+            e.printStackTrace();
+            return ResponseEntity.badRequest().build();
+        }
+        return  ResponseEntity.ok().build();
+    }
+
+    private String generateTemporaryPassword() {
+        return RandomStringUtils.random(10, true, true);
+    }
     @Override
     public User findByUserName(String userName) {
         return userRepository.findByUsername(userName);
     }
 
-    // Lấy ra các thông tin của user đó để xét quyền
+    // Change-Password
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username);
-        if (user == null) {
-            throw new UsernameNotFoundException("Tai khoan khong ton tai!");
-        }
-        org.springframework.security.core.userdetails.User user1 =
-                new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), roleToAuthorities(user.getRoleList()));
+    public ResponseEntity<?> changePassword(JsonNode jsonNode) {
+        try{
+            int idUser = Integer.parseInt(formatStringByJson(String.valueOf(jsonNode.get("idUser"))));
+            String newPassword = formatStringByJson(String.valueOf(jsonNode.get("newPassword")));
 
-        return user1;
+            Optional<User> user = userRepository.findById(idUser);
+            user.get().setPassword(bCryptPasswordEncoder.encode(newPassword));
+            userRepository.save(user.get());
+        }catch (Exception e){
+            e.printStackTrace();
+            return  ResponseEntity.badRequest().build();
+        }
+        return ResponseEntity.ok().build();
     }
 
+
+    // Lấy ra các thông tin của user đó để xét quyền
+//    @Override
+//    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+//        User user = userRepository.findByUsername(username);
+//        if (user == null) {
+//            throw new UsernameNotFoundException("Tai khoan khong ton tai!");
+//        }
+//        org.springframework.security.core.userdetails.User user1 =
+//                new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), roleToAuthorities(user.getRoleList()));
+//
+//        return user1;
+//    }
+
     // Lấy ra tên quyền
-    private Collection<? extends GrantedAuthority> roleToAuthorities(Collection<Role> roles) {
-        return roles.stream().map(role ->
-                new SimpleGrantedAuthority(role.getNameRole())
-        ).collect(Collectors.toList());
+//    private Collection<? extends GrantedAuthority> roleToAuthorities(Collection<Role> roles) {
+//        return roles.stream().map(role ->
+//                new SimpleGrantedAuthority(role.getNameRole())
+//        ).collect(Collectors.toList());
+//    }
+    private String formatStringByJson(String json) {
+        return json.replaceAll("\"", "");
     }
 }

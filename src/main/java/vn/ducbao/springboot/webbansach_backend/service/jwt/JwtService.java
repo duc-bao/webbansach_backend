@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import vn.ducbao.springboot.webbansach_backend.entity.Role;
 import vn.ducbao.springboot.webbansach_backend.entity.User;
+import vn.ducbao.springboot.webbansach_backend.service.UserSecurityService;
 import vn.ducbao.springboot.webbansach_backend.service.user.UserService;
 
 import java.security.Key;
@@ -23,15 +24,14 @@ import java.util.function.Function;
 
 @Component
 public class JwtService {
-    public static final String SECRET = "MTIzNDU2NDU5OThEMzIxM0F6eGMzNTE2NTQzMjEzMjE2NTQ5OHEzMTNhMnMxZDMyMnp4M2MyMQ==";
+    public static final String SECRET = "MTIzNDU2NDU5OThEMzIxM0F6eGMzNTE2NTQzMjEzMjE2NTQ5OHEzMTNhMnMxZDMyMnp4M2MyMQA==";
     @Autowired
-    @Lazy
-    private UserService userService;
+    private UserSecurityService userService;
 
     //Tạo JWT dựa trên username(tạo thông tin cần trả về cho FE khi đăng nhập thành công)
     public String generateToken(String username) {
         Map<String, Object> claims = new HashMap<>();
-        User user = userService.findByUserName(username);
+        User user = userService.findByUsername(username);
         claims.put("id", user.getIdUser());
         claims.put("avatar", user.getAvatar());
         claims.put("lastName", user.getLastName());
