@@ -15,7 +15,6 @@ import java.util.List;
 @RepositoryRestResource(path = "images")
 public interface ImageRepository extends JpaRepository<Image, Integer> {
     public List<Image> findImagesByBook(Book book);
-
     @Modifying
     @Transactional
     @Query("delete from Image i where i.icon = false AND i.book.idBook = :idBook")

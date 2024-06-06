@@ -75,5 +75,22 @@ public class UserController {
             return   ResponseEntity.badRequest().build();
         }
     }
-
+    @PutMapping("/change-avatar")
+    public  ResponseEntity<?> changeAvatar(@RequestBody JsonNode jsonNode){
+        try {
+            return  userSevice.changeAvatar(jsonNode);
+        }catch (Exception e){
+            e.printStackTrace();
+            return  ResponseEntity.badRequest().build();
+        }
+    }
+    @PutMapping("/update-profile")
+    public ResponseEntity<?> updateProfile(@RequestBody JsonNode jsonNode){
+        try {
+            return  userSevice.updateProfile(jsonNode);
+        }catch (Exception e){
+            e.printStackTrace();
+            return  ResponseEntity.badRequest().build();
+        }
+    }
 }

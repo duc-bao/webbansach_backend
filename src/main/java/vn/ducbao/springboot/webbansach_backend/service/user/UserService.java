@@ -11,4 +11,6 @@ public interface UserService {
     public User findByUserName(String userName);
     public ResponseEntity<?> activeUser(String email, String activeCode);
     public  ResponseEntity<?> forgotPassword(JsonNode jsonNode);
+    public  ResponseEntity<?> updateProfile(JsonNode jsonNode);
+    public ResponseEntity<?> changeAvatar(JsonNode jsonNode);
 }

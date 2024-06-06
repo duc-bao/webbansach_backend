@@ -1,6 +1,7 @@
 package vn.ducbao.springboot.webbansach_backend.service.user;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import jakarta.transaction.Transactional;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -10,13 +11,21 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import vn.ducbao.springboot.webbansach_backend.dao.RoleRepository;
 import vn.ducbao.springboot.webbansach_backend.dao.UserRepository;
 import vn.ducbao.springboot.webbansach_backend.entity.Notification;
 import vn.ducbao.springboot.webbansach_backend.entity.Role;
 import vn.ducbao.springboot.webbansach_backend.entity.User;
+import vn.ducbao.springboot.webbansach_backend.security.JwtResponse;
 import vn.ducbao.springboot.webbansach_backend.service.email.EmailService;
+import vn.ducbao.springboot.webbansach_backend.service.image.ImageService;
+import vn.ducbao.springboot.webbansach_backend.service.jwt.JwtService;
+import vn.ducbao.springboot.webbansach_backend.service.util.Base64MuiltipartFileConverter;
 
+import java.sql.Date;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.UUID;
@@ -32,7 +41,10 @@ public class UserSeviceImpl implements UserService {
     private EmailService emailService;
     @Autowired
     private RoleRepository roleRepository;
-
+    @Autowired
+    private ImageService imageService;
+    @Autowired
+    private JwtService jwtService;
     @Autowired
     public UserSeviceImpl(UserRepository userRepository, RoleRepository roleRepository) {
         this.userRepository = userRepository;
@@ -117,6 +129,8 @@ public class UserSeviceImpl implements UserService {
         return ResponseEntity.ok().build();
     }
 
+
+
     private ResponseEntity<?> sendEmailForgotPassword(String email, String passwordTemp) {
         String subject = "Reset mật khẩu";
         String text = "Mật khẩu tạm thời của bạn là: <strong>" + passwordTemp + " </strong>";
@@ -151,6 +165,63 @@ public class UserSeviceImpl implements UserService {
         }catch (Exception e){
             e.printStackTrace();
             return  ResponseEntity.badRequest().build();
+        }
+        return ResponseEntity.ok().build();
+    }
+    // Update profile
+    @Override
+    public ResponseEntity<?> updateProfile(JsonNode jsonNode) {
+        try {
+            int idUser = Integer.parseInt(formatStringByJson(String.valueOf(jsonNode.get("idUser"))));
+            String fisrtName = formatStringByJson(String.valueOf(jsonNode.get("firstName")));
+            String lastName = formatStringByJson(String.valueOf(jsonNode.get("lastName")));
+            // Fomat ngay sinh
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX");
+            Instant instant = Instant.from(formatter.parse(String.valueOf(jsonNode.get("dateOfBirth"))));
+            java.sql.Date dateOfBirth = new java.sql.Date(Date.from(instant).getTime());
+            String phoneNumber = formatStringByJson(String.valueOf(jsonNode.get("phoneNumber")));
+            String deliveryAddress = formatStringByJson(String.valueOf(jsonNode.get("deliveryAddress")));
+            String gender = formatStringByJson(String.valueOf(jsonNode.get("gender")));
+
+            Optional<User> user = userRepository.findById(idUser);
+            user.get().setFirstName(fisrtName);
+            user.get().setLastName(lastName);
+            user.get().setDateOfBirth(dateOfBirth);
+            user.get().setPhoneNumber(phoneNumber);
+            user.get().setGender(gender);
+            user.get().setDeliveryAdress(deliveryAddress);
+
+            userRepository.save(user.get());
+
+        }catch (Exception e){
+            e.printStackTrace();
+            return  ResponseEntity.badRequest().build();
+        }
+        return  ResponseEntity.ok().build();
+    }
+    // Change Avatar
+    @Override
+    @Transactional
+    public ResponseEntity<?> changeAvatar(JsonNode jsonNode) {
+        try {
+            int idUser = Integer.parseInt(formatStringByJson(String.valueOf(jsonNode.get("idUser"))));
+            String dataAvatar = formatStringByJson(String.valueOf(jsonNode.get("avatar")));
+            Optional<User> user = userRepository.findById(idUser);
+            // Xoá đi ảnh trước đó trong cloudinary
+            if(user.get().getAvatar().length() > 0){
+                imageService.deleteImage(user.get().getAvatar());
+            }
+            if(Base64MuiltipartFileConverter.isBase64(dataAvatar)){
+                MultipartFile multipartFile = Base64MuiltipartFileConverter.convert(dataAvatar);
+                String avatarURL = imageService.uploadImage(multipartFile, "User_" + idUser);
+                user.get().setAvatar(avatarURL);
+            }
+            User newUser = userRepository.save(user.get());
+            final String jwt = jwtService.generateToken(newUser.getUsername());
+            return ResponseEntity.ok(new JwtResponse(jwt));
+        }catch (Exception e){
+            e.printStackTrace();
+            ResponseEntity.badRequest().build();
         }
         return ResponseEntity.ok().build();
     }
