@@ -25,6 +25,7 @@ public class Endpoints {
             "/user/login",
             "/book/add-book/**",
             "/review/add-review/**",
+            "/order/add-order",
     };
     public  static  final String [] PUBLIC_DELETE_ENDPOINT ={
 
