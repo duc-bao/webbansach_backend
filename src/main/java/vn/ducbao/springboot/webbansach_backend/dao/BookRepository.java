@@ -10,10 +10,10 @@ import vn.ducbao.springboot.webbansach_backend.entity.Book;
 
 @RepositoryRestResource(path = "books")
 public interface BookRepository extends JpaRepository<Book, Integer> {
-    Page<Book> findByNameContaining(@RequestParam("name_book") String nameBook, Pageable pageable);
+    Page<Book> findByNameBookContaining(@RequestParam("name_book") String nameBook, Pageable pageable);
 
     //    Lấy danh sách thể loại
     Page<Book> findByCategoryList_IdCategory(@RequestParam("id_category") int idCategory, Pageable pageable);
     //Lấy sách và thể loại
-    Page<Book> findByNameContainingAndCategoryList_IdCategory(@RequestParam("name_book") String nameBook,@RequestParam("id_category") int idCategory, Pageable pageable);
+    Page<Book> findByNameBookContainingAndCategoryList_IdCategory(@RequestParam("name_book") String nameBook,@RequestParam("id_category") int idCategory, Pageable pageable);
 }

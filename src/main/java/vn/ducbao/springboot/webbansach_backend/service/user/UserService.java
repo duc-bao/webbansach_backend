@@ -13,4 +13,5 @@ public interface UserService {
     public  ResponseEntity<?> forgotPassword(JsonNode jsonNode);
     public  ResponseEntity<?> updateProfile(JsonNode jsonNode);
     public ResponseEntity<?> changeAvatar(JsonNode jsonNode);
+    public  ResponseEntity<?> save(JsonNode jsonNode, String option);
 }

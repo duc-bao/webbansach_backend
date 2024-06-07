@@ -93,4 +93,22 @@ public class UserController {
             return  ResponseEntity.badRequest().build();
         }
     }
+    @PostMapping("/add-user")
+    public  ResponseEntity<?> save(@RequestBody JsonNode jsonNode){
+        try {
+            return  userSevice.save(jsonNode, "add");
+        }catch (Exception e) {
+            e.printStackTrace();
+            return  ResponseEntity.badRequest().build();
+        }
+    }
+    @PutMapping("/update-user")
+    public  ResponseEntity<?> updateUser(@RequestBody JsonNode jsonNode){
+        try {
+            return  userSevice.save(jsonNode, "update");
+        }catch (Exception e){
+            e.printStackTrace();
+            return  ResponseEntity.badRequest().build();
+        }
+    }
 }

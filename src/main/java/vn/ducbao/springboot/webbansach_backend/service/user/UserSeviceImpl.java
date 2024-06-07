@@ -1,6 +1,7 @@
 package vn.ducbao.springboot.webbansach_backend.service.user;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,9 +27,7 @@ import vn.ducbao.springboot.webbansach_backend.service.util.Base64MuiltipartFile
 import java.sql.Date;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
-import java.util.Collection;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -45,11 +44,12 @@ public class UserSeviceImpl implements UserService {
     private ImageService imageService;
     @Autowired
     private JwtService jwtService;
-    @Autowired
-    public UserSeviceImpl(UserRepository userRepository, RoleRepository roleRepository) {
-        this.userRepository = userRepository;
-        this.roleRepository = roleRepository;
+    private  final ObjectMapper objectMapper;
+
+    public UserSeviceImpl(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
     }
+
 
     @Override
     public ResponseEntity<?> register(User user) {
@@ -226,6 +226,59 @@ public class UserSeviceImpl implements UserService {
         return ResponseEntity.ok().build();
     }
 
+
+    // ADD USER
+    @Override
+    public ResponseEntity<?> save(JsonNode jsonNode, String option) {
+        try{
+            User user = objectMapper.treeToValue(jsonNode, User.class);
+            // Kiểm tra username tồn tại chưa
+            if(!option.equals("update")){
+                if(userRepository.existsByUsername(user.getUsername())){
+                    return  ResponseEntity.badRequest().body(new Notification("Username da ton tai"));
+
+                }
+                if(userRepository.existsByEmail(user.getEmail())){
+                    return  ResponseEntity.badRequest().body(new Notification(("Email da ton tai")));
+                }
+            }
+            // Set ngay sinh cho user
+            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX");
+            Instant instant = Instant.from(dateTimeFormatter.parse(formatStringByJson(String.valueOf(jsonNode.get("dateOfBirth")))));
+            Date dateOfBirth = new Date(Date.from(instant).getTime());
+            user.setDateOfBirth(dateOfBirth);
+            // Set role cho user
+            int idRole = Integer.parseInt(formatStringByJson(String.valueOf(jsonNode.get("role"))));
+            Optional<Role> role = roleRepository.findById(idRole);
+            List<Role> roleList = new ArrayList<>();
+            roleList.add(role.get());
+            user.setRoleList(roleList);
+
+            // Ma hoa mat khau
+
+            if(!(user.getPassword() == null)){ // Trường hợp là thêm hoặc thay đổi password
+                String encodePassword = bCryptPasswordEncoder.encode(user.getPassword());
+                user.setPassword(encodePassword);
+            }else {
+                // Trường hợp cho update không thay đổi password
+                Optional<User> userTemp = userRepository.findById(user.getIdUser());
+                user.setPassword(userTemp.get().getPassword());
+            }
+            // Set avatar
+            String avatar = formatStringByJson(String.valueOf(jsonNode.get("avatar")));
+            if(avatar.length() > 500){
+                MultipartFile multipartFile = Base64MuiltipartFileConverter.convert(avatar);
+                String avatarURL = imageService.uploadImage(multipartFile, "User_" + user.getIdUser());
+                user.setAvatar(avatarURL);
+            }
+            userRepository.save(user);
+
+        }catch (Exception e){
+            e.printStackTrace();
+            return  ResponseEntity.badRequest().build();
+        }
+        return ResponseEntity.ok("thành công");
+    }
 
     // Lấy ra các thông tin của user đó để xét quyền
 //    @Override

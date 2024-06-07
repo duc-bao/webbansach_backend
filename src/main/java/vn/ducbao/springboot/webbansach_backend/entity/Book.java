@@ -14,7 +14,7 @@ public class Book {
     @Column(name = "id_book")
     private int idBook;
     @Column(name = "name_book", length = 256)
-    private String name;
+    private String nameBook;
 //    @Column(name = "cost_book")
 //    private String cost;
     @Column(name = "author", length = 512)
@@ -57,7 +57,7 @@ public class Book {
     public String toString() {
         return "Book{" +
                 "idBook=" + idBook +
-                ", name='" + name + '\'' +
+                ", name='" + nameBook + '\'' +
                 ", author='" + author + '\'' +
                 ", ISBN='" + ISBN + '\'' +
                 ", listPrice=" + listPrice +

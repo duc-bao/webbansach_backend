@@ -19,6 +19,8 @@ public class Endpoints {
             "/users/*/roleList",
             "/users/*",
             "/review/**",
+            "/reviews/*/user",
+
     };
     public  static  final String[] PUBLIC_POST_ENDPOINT = {
             "/user/register",
@@ -49,6 +51,7 @@ public class Endpoints {
             "/orders/**",
             "/books",
             "/books/**",
+
             "/**",
 
     };
