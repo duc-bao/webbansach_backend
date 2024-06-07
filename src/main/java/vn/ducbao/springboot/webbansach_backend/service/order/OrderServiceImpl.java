@@ -2,12 +2,15 @@ package vn.ducbao.springboot.webbansach_backend.service.order;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.transaction.Transactional;
+import org.aspectj.weaver.ast.Or;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import vn.ducbao.springboot.webbansach_backend.dao.*;
 import vn.ducbao.springboot.webbansach_backend.entity.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -72,6 +75,55 @@ public class OrderServiceImpl implements OrderService{
            return  ResponseEntity.badRequest().build();
        }
     }
+
+    @Override
+    @Transactional
+    public ResponseEntity<?> updateOrder(JsonNode jsonNode) {
+        try{
+            int idOrder =  Integer.parseInt(formatStringByJson(String.valueOf(jsonNode.get("idOrder"))));
+            String status = formatStringByJson(String.valueOf(jsonNode.get("status")));
+            Optional<Order> order = orderRepository.findById(idOrder);
+            order.get().setStatus(status);
+            // Lấy ra order detail
+            if(status.equals("Bị hủy")){
+                List<OrderDetail> orderDetailList = orderDetailRepository.findOrderDetailsByOrder(order.get());
+                for(OrderDetail orderDetail : orderDetailList){
+                    Book bookResponse = orderDetail.getBook();
+                    bookResponse.setQuantity(bookResponse.getQuantity() - orderDetail.getQuantity());
+                    bookResponse.setSoldQuantity(bookResponse.getSoldQuantity() + orderDetail.getQuantity());
+                    bookRepository.save(bookResponse);
+                }
+            }
+            orderRepository.save(order.get());
+            return  ResponseEntity.ok().build();
+        }catch (Exception e){
+            e.printStackTrace();
+            return  ResponseEntity.badRequest().build();
+        }
+    }
+
+    @Override
+    public ResponseEntity<?> cancel(JsonNode jsonNode) {
+       try {
+           int idUser = Integer.parseInt(formatStringByJson(String.valueOf(jsonNode.get("idUser"))));
+           User user = userRepository.findById(idUser).get();
+           Order order = orderRepository.findFirstByUserOrderByIdOrderDesc(user);
+           order.setStatus("Bị hủy");
+           List<OrderDetail> orderDetailList = orderDetailRepository.findOrderDetailsByOrder(order);
+           for (OrderDetail orderDetail : orderDetailList){
+               Book bookOrderDetail = orderDetail.getBook();
+               bookOrderDetail.setSoldQuantity(bookOrderDetail.getSoldQuantity() - orderDetail.getQuantity());
+               bookOrderDetail.setQuantity(bookOrderDetail.getQuantity() + orderDetail.getQuantity());
+               bookRepository.save(bookOrderDetail);
+           }
+           orderRepository.save(order);
+           return ResponseEntity.ok().build();
+       }catch (Exception e){
+           e.printStackTrace();
+           return  ResponseEntity.badRequest().build();
+       }
+    }
+
     private String formatStringByJson(String json) {
         return json.replaceAll("\"", "");
     }

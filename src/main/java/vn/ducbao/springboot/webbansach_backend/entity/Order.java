@@ -36,7 +36,7 @@ public class Order {
     private double feeDelivery;
     @Column(name = "total_price")
     private double totalPrice;
-    @ManyToOne(cascade = {                   CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH
+    @ManyToOne(cascade = { CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH
     })
     @JoinColumn(name = "id_user")
     private User user;

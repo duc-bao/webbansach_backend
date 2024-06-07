@@ -5,4 +5,6 @@ import org.springframework.http.ResponseEntity;
 
 public interface OrderService {
     public ResponseEntity<?> addOrder(JsonNode jsonNode);
+    public  ResponseEntity<?> updateOrder(JsonNode jsonNode);
+    public  ResponseEntity<?> cancel(JsonNode jsonNode);
 }

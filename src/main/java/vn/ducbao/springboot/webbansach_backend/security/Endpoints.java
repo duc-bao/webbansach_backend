@@ -15,12 +15,12 @@ public class Endpoints {
             "/user/active-account/**",
             "/cart-items/**",
             "/users/*/listCartItems",
-            "/users/*/listOrders",
+            "/users/*/orderList",
             "/users/*/roleList",
             "/users/*",
             "/review/**",
             "/reviews/*/user",
-
+            "/order-details/*/book",
     };
     public  static  final String[] PUBLIC_POST_ENDPOINT = {
             "/user/register",
@@ -37,7 +37,8 @@ public class Endpoints {
             "/user/change-password",
             "/user/update-profile",
             "/user/change-avatar",
-            "/review/update-review"
+            "/review/update-review",
+            "/order/update-order",
     };
     public  static  final  String[] ADMIN_ENDPOINT = {
             "/cart-items/**",
