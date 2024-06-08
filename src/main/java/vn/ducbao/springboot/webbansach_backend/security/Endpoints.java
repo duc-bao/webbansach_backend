@@ -22,6 +22,7 @@ public class Endpoints {
             "/reviews/*/user",
             "/order-details/*/book",
             "/favorite-book/get-favorite-book/*",
+            "/feedbacks/**"
     };
     public  static  final String[] PUBLIC_POST_ENDPOINT = {
             "/user/register",
@@ -58,6 +59,7 @@ public class Endpoints {
             "/orders/**",
             "/books",
             "/books/**",
+            "/feedback/update-feedback/**",
             "/**",
 
     };

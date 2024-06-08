@@ -3,10 +3,7 @@ package vn.ducbao.springboot.webbansach_backend.controller;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import vn.ducbao.springboot.webbansach_backend.service.feedback.FeedBackService;
 
 @RestController
@@ -24,5 +21,13 @@ public class FeedBackController {
             return  ResponseEntity.badRequest().build();
         }
     }
-
+    @PutMapping("/update-feedback/{idFeedBack}")
+    public ResponseEntity<?> updateFeedBack(@PathVariable Integer idFeedBack){
+        try {
+            return feedBackService.updateFeedBack(idFeedBack);
+        }catch (Exception e){
+            e.printStackTrace();
+            return ResponseEntity.badRequest().build();
+        }
+    }
 }

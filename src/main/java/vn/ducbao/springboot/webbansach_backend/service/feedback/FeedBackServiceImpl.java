@@ -1,6 +1,7 @@
 package vn.ducbao.springboot.webbansach_backend.service.feedback;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -18,9 +19,12 @@ import java.time.format.DateTimeFormatter;
 public class FeedBackServiceImpl implements FeedBackService{
     @Autowired
     private UserRepository userRepository;
+    private final ObjectMapper objectMapper;
     @Autowired
     private FeedBackRepository feedBackRepository;
-    @Override
+    public FeedBackServiceImpl(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
     public ResponseEntity<?> addFeedBack(JsonNode jsonNode) {
         try {
             User user = userRepository.findByUsername(formatStringByJson(String.valueOf(jsonNode.get("user"))));
@@ -40,6 +44,20 @@ public class FeedBackServiceImpl implements FeedBackService{
             return  ResponseEntity.badRequest().build();
         }
     }
+
+    @Override
+    public ResponseEntity<?> updateFeedBack(Integer idFeedback) {
+        try {
+            FeedBack feedBack = feedBackRepository.findById(idFeedback).get();
+            feedBack.setReaded(true);
+            feedBackRepository.save(feedBack);
+            return ResponseEntity.ok("Thành công");
+        }catch (Exception e){
+            e.printStackTrace();
+            return  ResponseEntity.badRequest().build();
+        }
+    }
+
     private String formatStringByJson(String json) {
         return json.replaceAll("\"", "");
     }

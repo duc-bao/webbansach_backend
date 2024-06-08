@@ -5,4 +5,5 @@ import org.springframework.http.ResponseEntity;
 
 public interface FeedBackService {
     public ResponseEntity<?> addFeedBack(JsonNode jsonNode);
+    public  ResponseEntity<?> updateFeedBack(Integer idFeedbac);
 }
