@@ -1,9 +1,15 @@
 package vn.ducbao.springboot.webbansach_backend.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "list_favorites")
 public class FavoriteBook {
@@ -17,5 +23,14 @@ public class FavoriteBook {
     @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinColumn(name = "id_book", nullable = false)
     private Book book;
+
+    @Override
+    public String toString() {
+        return "FavoriteBook{" +
+                "id_favorite=" + id_favorite +
+                ", user=" + user +
+                ", book=" + book +
+                '}';
+    }
 }
 

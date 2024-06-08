@@ -28,14 +28,18 @@ public class CartItemServiceImpl implements CartItemService {
     @Override
     public ResponseEntity<?> save(JsonNode jsonNode) {
         try {
+//            System.out.println(jsonNode.toString());
             int idUser = 0;
             List<CartItem> cartItemListData = new ArrayList<>();
             for (JsonNode jsonNode1 : jsonNode){
+                //CartItem cartItemData = objectMapper.convertValue(jsonNode1, CartItem.class);
                 CartItem cartItemData = objectMapper.treeToValue(jsonNode1, CartItem.class);
+                //System.out.println(cartItemData.toString());
                 idUser = Integer.parseInt(formatStringByJson(String.valueOf(jsonNode1.get("idUser"))));
                 cartItemListData.add(cartItemData);
             }
             Optional<User> user = userRepository.findById(idUser);
+            System.out.println(user.get().getIdUser());
             // Danh sach item cuar user
             List<CartItem> cartItemList = user.get().getListCartItems();
             // Lap qua tung item va xu li
@@ -74,7 +78,18 @@ public class CartItemServiceImpl implements CartItemService {
 
     @Override
     public ResponseEntity<?> update(JsonNode jsonNode) {
-        return null;
+        try{
+            System.out.println(jsonNode.toString());
+            int idCart = Integer.parseInt(formatStringByJson(String.valueOf(jsonNode.get("idCart"))));
+            int quatity = Integer.parseInt(formatStringByJson(String.valueOf(jsonNode.get("quantity"))));
+            Optional<CartItem> cartItem = cartItemRepository.findById(idCart);
+            cartItem.get().setQuantity(quatity);
+            cartItemRepository.save(cartItem.get());
+            return  ResponseEntity.ok().build();
+        }catch (Exception e){
+            e.printStackTrace();
+            return  ResponseEntity.badRequest().build();
+        }
     }
     private String formatStringByJson(String json) {
         return json.replaceAll("\"", "");

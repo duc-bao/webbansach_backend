@@ -1,9 +1,13 @@
 package vn.ducbao.springboot.webbansach_backend.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "cart_item")
 public class CartItem {
@@ -19,4 +23,14 @@ public class CartItem {
     @ManyToOne()
     @JoinColumn(name = "id_user", nullable = false)
     private User user;
+
+    @Override
+    public String toString() {
+        return "CartItem{" +
+                "idCart=" + idCart +
+                ", quantity=" + quantity +
+                ", book=" + book +
+                ", user=" + user +
+                '}';
+    }
 }
