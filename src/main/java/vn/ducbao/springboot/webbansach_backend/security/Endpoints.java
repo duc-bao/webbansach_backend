@@ -31,6 +31,7 @@ public class Endpoints {
             "/order/add-order",
             "/cart-item/add-cart",
             "/favorite-book/add-favorite",
+            "/feedback/add-feedback/**"
     };
     public  static  final String [] PUBLIC_DELETE_ENDPOINT ={
         "/cart-items/**",

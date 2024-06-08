@@ -31,9 +31,9 @@ public class JwtFilter extends OncePerRequestFilter {
         // lấy token người dùng truyền vào và lấy username dựa trên token đó
         if(authHeader!= null && authHeader.startsWith("Bearer ")){
             token = authHeader.substring(7);
-            System.out.println("Token: " + token);
+           // System.out.println("Token: " + token);
             username = jwtService.extractUsername(token);
-            System.out.println("Username: " + username);
+            //System.out.println("Username: " + username);
         }
         // ==> Từ chuỗi token lấy được chúng ta thêm người dùng vào cái request đó
         // Kiểm tra xem user có tồn tại và đã đăng nhập hay chưa
