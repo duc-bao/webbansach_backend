@@ -22,7 +22,8 @@ public class Endpoints {
             "/reviews/*/user",
             "/order-details/*/book",
             "/favorite-book/get-favorite-book/*",
-            "/feedbacks/**"
+            "/feedbacks/**",
+            "/vnpay/**",
     };
     public  static  final String[] PUBLIC_POST_ENDPOINT = {
             "/user/register",
@@ -32,7 +33,8 @@ public class Endpoints {
             "/order/add-order",
             "/cart-item/add-cart",
             "/favorite-book/add-favorite",
-            "/feedback/add-feedback/**"
+            "/feedback/add-feedback/**",
+            "/vnpay/create-payment/**",
     };
     public  static  final String [] PUBLIC_DELETE_ENDPOINT ={
         "/cart-items/**",
