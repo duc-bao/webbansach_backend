@@ -1,0 +1,29 @@
+version: '3.8'
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql_book
+    environment:
+      MYSQL_DATABASE: webbansach
+      MYSQL_USER: ducbao
+      MYSQL_PASSWORD: 2904
+      MYSQL_ROOT_PASSWORD: 2904
+    ports:
+      - 3308:3306
+    volumes:
+      - mysql:/var/lib/mysql
+      - D:/backup:/docker-entrypoint-initdb.d
+  webbansach:
+    image: webbansach
+    container_name: webbansach
+    ports:
+      - 8081:8080
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/webbansach
+      SPRING_DATASOURCE_USERNAME: ducbao
+      SPRING_DATASOURCE_PASSWORD: 2904
+    depends_on:
+      - mysql
+volumes:
+  webbansach:
+  mysql:
