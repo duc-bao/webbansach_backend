@@ -62,8 +62,10 @@ public class Endpoints {
             "/books",
             "/books/**",
             "/feedback/update-feedback/**",
+            "/book/get-total/**",
+            "/feedbacks/search/countBy/**",
+            "/review/**",
             "/**",
-
     };
 
 }

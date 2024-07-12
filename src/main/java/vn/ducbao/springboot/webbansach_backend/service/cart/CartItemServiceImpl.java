@@ -39,7 +39,7 @@ public class CartItemServiceImpl implements CartItemService {
                 cartItemListData.add(cartItemData);
             }
             Optional<User> user = userRepository.findById(idUser);
-            System.out.println(user.get().getIdUser());
+            //System.out.println(user.get().getIdUser());
             // Danh sach item cuar user
             List<CartItem> cartItemList = user.get().getListCartItems();
             // Lap qua tung item va xu li

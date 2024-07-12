@@ -16,4 +16,5 @@ public interface BookRepository extends JpaRepository<Book, Integer> {
     Page<Book> findByCategoryList_IdCategory(@RequestParam("id_category") int idCategory, Pageable pageable);
     //Lấy sách và thể loại
     Page<Book> findByNameBookContainingAndCategoryList_IdCategory(@RequestParam("name_book") String nameBook,@RequestParam("id_category") int idCategory, Pageable pageable);
+    long count();
 }

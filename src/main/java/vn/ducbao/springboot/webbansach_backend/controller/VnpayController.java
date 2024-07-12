@@ -16,9 +16,9 @@ import java.util.*;
 @RequestMapping("/vnpay")
 public class VnpayController {
     @PostMapping("/create-payment")
-    public ResponseEntity<?> createPayment(HttpServletRequest request, @RequestParam("amount") long amountRequest) throws UnsupportedEncodingException {
+    public ResponseEntity<?> createPayment(HttpServletRequest request, @RequestParam("amount") double  amountRequest) throws UnsupportedEncodingException {
         String orderType = "other";
-        long amount = amountRequest * 100;
+        long amount = (long) (amountRequest * 100);
         String vnp_TxnRef = VnpayConfig.getRandomNumber(8);
         String vnp_IpAddr = VnpayConfig.getIpAddress(request);
         String vnp_TmnCode = VnpayConfig.vnp_TmnCode;

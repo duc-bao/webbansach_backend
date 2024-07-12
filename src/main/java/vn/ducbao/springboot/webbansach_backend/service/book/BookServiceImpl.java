@@ -175,6 +175,11 @@ public class BookServiceImpl implements BookService{
         }
     }
 
+    @Override
+    public long getTotalBook() {
+     return   bookRepository.count();
+    }
+
     public String formatStringByJson(String json){
         return  json.replace("\"", "");
     }

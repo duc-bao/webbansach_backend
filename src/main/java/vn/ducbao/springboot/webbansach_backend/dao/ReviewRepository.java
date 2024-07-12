@@ -8,4 +8,5 @@ import vn.ducbao.springboot.webbansach_backend.entity.Review;
 @RepositoryRestResource(path = "reviews")
 public interface ReviewRepository extends JpaRepository<Review, Integer> {
     public  Review findReviewByOrderDetail(OrderDetail orderDetail);
+    public  long countBy();
 }
