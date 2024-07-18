@@ -5,8 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import vn.ducbao.springboot.webbansach_backend.dao.CartItemRepository;
-import vn.ducbao.springboot.webbansach_backend.dao.UserRepository;
+import vn.ducbao.springboot.webbansach_backend.repository.CartItemRepository;
+import vn.ducbao.springboot.webbansach_backend.repository.UserRepository;
 import vn.ducbao.springboot.webbansach_backend.entity.CartItem;
 import vn.ducbao.springboot.webbansach_backend.entity.User;
 

@@ -10,6 +10,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.parameters.P;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import vn.ducbao.springboot.webbansach_backend.dto.request.JwtRequest;
 import vn.ducbao.springboot.webbansach_backend.entity.Notification;
 import vn.ducbao.springboot.webbansach_backend.entity.User;
 import vn.ducbao.springboot.webbansach_backend.security.JwtResponse;
@@ -27,6 +28,9 @@ public class UserController {
     private AuthenticationManager  authenticationManager;
     @Autowired
     private JwtService jwtService;
+
+
+
     @PostMapping("/register")
     public ResponseEntity<?> register(@Validated @RequestBody User user){
         ResponseEntity<?> response = userSevice.register(user);
@@ -47,7 +51,8 @@ public class UserController {
             // Nếu xác thực thành công , tạo token JWT
             if(authentication.isAuthenticated()){
                 final String jwt = jwtService.generateToken(loginRequest.getUsername());
-                return ResponseEntity.ok(new JwtResponse(jwt));
+                final String refreshToken = jwtService.generateRefreshToken(loginRequest.getUsername());
+                return ResponseEntity.ok(new JwtResponse(jwt, refreshToken));
             }
         }catch (AuthenticationException e){
             //Nếu xác thực không thành công

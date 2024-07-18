@@ -6,15 +6,21 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import vn.ducbao.springboot.webbansach_backend.dao.BookRepository;
-import vn.ducbao.springboot.webbansach_backend.dao.CategoryRepository;
-import vn.ducbao.springboot.webbansach_backend.dao.ImageRepository;
+import vn.ducbao.springboot.webbansach_backend.dto.response.BookListResponse;
+import vn.ducbao.springboot.webbansach_backend.repository.BookRepository;
+import vn.ducbao.springboot.webbansach_backend.repository.CategoryRepository;
+import vn.ducbao.springboot.webbansach_backend.repository.ImageRepository;
 import vn.ducbao.springboot.webbansach_backend.entity.Book;
 import vn.ducbao.springboot.webbansach_backend.entity.Category;
 import vn.ducbao.springboot.webbansach_backend.entity.Image;
+//import vn.ducbao.springboot.webbansach_backend.service.BookRedisService;
 import vn.ducbao.springboot.webbansach_backend.service.image.ImageService;
 import vn.ducbao.springboot.webbansach_backend.service.util.Base64MuiltipartFileConverter;
 
@@ -33,12 +39,35 @@ public class BookServiceImpl implements BookService{
     private ImageRepository imageRepository;
     @Autowired
     private ImageService imageService;
+//    @Autowired
+//    private BookRedisService bookRedisService;
     public  final ObjectMapper objectMapper;
 
     public BookServiceImpl(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
-
+//    @Override
+//    public List<Book> getBook(String keyword, int categoryId, int page, int size) throws JsonProcessingException {
+//        int totalPage = 0;
+//        PageRequest pageRequest =   PageRequest.of(page, size,
+//                Sort.by("id").descending());
+//        List<Book> bookListResponses = bookRedisService.getAllProduct(keyword, categoryId, pageRequest);
+//        if(bookListResponses == null){
+//            Page<Book> bookPage = getBookList(page,size,"id", keyword, categoryId);
+//            totalPage = bookPage.getTotalPages();
+//            bookListResponses = bookPage.getContent();
+//            bookRedisService.save(bookListResponses,keyword, categoryId, pageRequest);
+//        }
+//        return  bookListResponses;
+//    }
+//    public Page<Book> getBookList(int page, int size, String sortby, String keyword, int categoriId) throws JsonProcessingException {
+//        Sort sort = Sort.by(sortby).descending();
+//        Pageable pageable = PageRequest.of(page, size, sort);
+//        Page<Book> bookListResponses = bookRepository.findByNameBookContainingAndCategoryList_IdCategory(keyword, categoriId, pageable);
+////        List<Book> bookList = bookListResponses.getContent();
+//        return  bookListResponses;
+//
+//    }
     @Override
     public ResponseEntity<?> save(JsonNode jsonNode) throws JsonProcessingException {
         try {
@@ -179,6 +208,9 @@ public class BookServiceImpl implements BookService{
     public long getTotalBook() {
      return   bookRepository.count();
     }
+
+
+
 
     public String formatStringByJson(String json){
         return  json.replace("\"", "");

@@ -1,11 +1,13 @@
 package vn.ducbao.springboot.webbansach_backend.service.jwt;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import com.auth0.jwt.JWT;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -16,18 +18,20 @@ import vn.ducbao.springboot.webbansach_backend.service.UserSecurityService;
 import vn.ducbao.springboot.webbansach_backend.service.user.UserService;
 
 import java.security.Key;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 
 @Component
 public class JwtService {
-    public static final String SECRET = "MTIzNDU2NDU5OThEMzIxM0F6eGMzNTE2NTQzMjEzMjE2NTQ5OHEzMTNhMnMxZDMyMnp4M2MyMQA==";
+    @Value("${spring.token.key}")
+    private   String SECRET;
+    @Value("${spring.token.expireToken}")
+    private long expireExpiraToken;
+    @Value("${spring.token.expireRefreshToken}")
+    private long expireRefreshToken;
     @Autowired
     private UserSecurityService userService;
-
+    Logger logger = LoggerFactory.getLogger(JwtService.class);
     //Tạo JWT dựa trên username(tạo thông tin cần trả về cho FE khi đăng nhập thành công)
     public String generateToken(String username) {
         Map<String, Object> claims = new HashMap<>();
@@ -36,6 +40,7 @@ public class JwtService {
         claims.put("avatar", user.getAvatar());
         claims.put("lastName", user.getLastName());
         claims.put("enabled", user.isEnabled());
+        claims.put("jti", UUID.randomUUID().toString());
         List<Role> list = user.getRoleList();
         if (user != null && user.getRoleList().size() >= 0) {
             for (Role r : list
@@ -57,14 +62,27 @@ public class JwtService {
         //        claims.put("isAdmin", true);
         return createToken(claims, username);
     }
-
+    public  String generateRefreshToken(String username) {
+        User user = userService.findByUsername(username);
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("jti", UUID.randomUUID().toString());
+        return createRefreshToken(claims, username);
+    }
+    private  String createRefreshToken(Map<String, Object> claims, String username) {
+        return  Jwts.builder().setClaims(claims).setSubject(username).setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + expireRefreshToken))
+                .signWith(SignatureAlgorithm.HS256, getSignKey()).compact();
+    }
+    public String extractIdToken(String token) {
+        return  extractClaim(token, claims -> claims.get("jti").toString());
+    }
     // Tạo JWT với các claims đã cho
     private String createToken(Map<String, Object> claims, String username) {
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(username)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() +  100000L * 60 * 60 * 1000)) //JWT hết hạn sau 30p
+                .setExpiration(new Date(System.currentTimeMillis() + expireExpiraToken)) //JWT hết hạn sau 30p
                 .signWith(SignatureAlgorithm.HS256, getSignKey())
                 .compact();
     }
@@ -99,6 +117,21 @@ public class JwtService {
     // kiểm tra token đã hết hạn hay chưa
     private Boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
+    }
+    public boolean validateTokenLogout(String token) {
+        try {
+            Jwts.parser().setSigningKey(getSignKey()).parse(token);
+            return true;
+        } catch (MalformedJwtException e) {
+            logger.error("Invalid JWT token: {}", e.getMessage());
+        } catch (ExpiredJwtException e) {
+            logger.error("JWT token is expired: {}", e.getMessage());
+        } catch (UnsupportedJwtException e) {
+            logger.error("JWT token is unsupported: {}", e.getMessage());
+        } catch (IllegalArgumentException e) {
+            logger.error("JWT claims string is empty: {}", e.getMessage());
+        }
+        return false;
     }
 
     // Kiểm tra tính hợp lệ của token

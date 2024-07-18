@@ -23,7 +23,7 @@ services:
       REDIS_PORT: 6379
       REDIS_DATABASE: 16
     volumes:
-      - redis-data:/data
+      - ./redis-data:/data
     command: redis-server --appendonly yes --requirepass 2904 # Đặt mật khẩu cho Redis và bật tính năng ghi dữ liệu
 
   webbansach:

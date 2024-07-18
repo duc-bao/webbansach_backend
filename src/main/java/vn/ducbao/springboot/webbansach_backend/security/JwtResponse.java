@@ -1,18 +1,19 @@
 package vn.ducbao.springboot.webbansach_backend.security;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class JwtResponse {
-    private final String jwt;
+    private  String token;
+    private String refreshToken;
 
-    public JwtResponse(String jwt) {
-        this.jwt = jwt;
-    }
-
-    public String getJwt() {
-        return jwt;
+    public JwtResponse(String token) {
+        this.token = token;
     }
 }

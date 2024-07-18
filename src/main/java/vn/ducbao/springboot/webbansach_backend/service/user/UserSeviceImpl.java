@@ -6,15 +6,12 @@ import jakarta.transaction.Transactional;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import vn.ducbao.springboot.webbansach_backend.dao.RoleRepository;
-import vn.ducbao.springboot.webbansach_backend.dao.UserRepository;
+import vn.ducbao.springboot.webbansach_backend.dto.request.JwtRequest;
+import vn.ducbao.springboot.webbansach_backend.repository.RoleRepository;
+import vn.ducbao.springboot.webbansach_backend.repository.UserRepository;
 import vn.ducbao.springboot.webbansach_backend.entity.Notification;
 import vn.ducbao.springboot.webbansach_backend.entity.Role;
 import vn.ducbao.springboot.webbansach_backend.entity.User;
@@ -28,7 +25,6 @@ import java.sql.Date;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class UserSeviceImpl implements UserService {
@@ -279,6 +275,7 @@ public class UserSeviceImpl implements UserService {
         }
         return ResponseEntity.ok("thành công");
     }
+
 
     // Lấy ra các thông tin của user đó để xét quyền
 //    @Override
