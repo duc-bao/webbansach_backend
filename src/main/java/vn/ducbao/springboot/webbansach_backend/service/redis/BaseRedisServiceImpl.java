@@ -9,16 +9,13 @@ import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @Service
 @Slf4j
 public class BaseRedisServiceImpl implements BaseRedisService{
-    private  final    RedisTemplate<String, Object> redisTemplate;
+    private  final   RedisTemplate<String, Object> redisTemplate;
     private final HashOperations<String, String, Object> hashOperations;
 
     public BaseRedisServiceImpl(RedisTemplate<String, Object> redisTemplate){
@@ -51,13 +48,17 @@ public class BaseRedisServiceImpl implements BaseRedisService{
 
     @Override
     public Object get(String key) {
-
         return redisTemplate.opsForValue().get(key);
     }
     // Lấy ra 1 map
     @Override
     public Map<String, Object> getField(String key) {
-        return  hashOperations.entries(key);
+        Map<String, Object> entries = hashOperations.entries(key);
+        if (entries == null || entries.isEmpty()) {
+            // Không có dữ liệu trong Redis, xử lý theo cách bạn muốn
+            return Collections.emptyMap(); // Hoặc trả về một giá trị khác
+        }
+        return entries;
     }
 
     @Override

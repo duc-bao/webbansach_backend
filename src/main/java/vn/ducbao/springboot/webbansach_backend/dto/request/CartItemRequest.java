@@ -4,12 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import vn.ducbao.springboot.webbansach_backend.entity.Book;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 public class CartItemRequest {
-    private int productId;
-    private int quantity;
+    int idBook;
+    int quantity;
 }

@@ -9,7 +9,7 @@ import java.util.List;
 @Data
 @Entity
 @Table(name = "user")
-public class User {
+public class User  {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_user")
@@ -40,24 +40,7 @@ public class User {
     private boolean enabled; // Trạng thái kích hoạt
     @Column(name = "activation_code")
     private String activationCode; // Mã kích hoạt
-    @Override
-    public String toString() {
-        return "User{" +
-                "idUser=" + idUser +
-                ", firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", username='" + username + '\'' +
-                ", password='" + password + '\'' +
-                ", gender=" + gender +
-                ", dateOfBirth=" + dateOfBirth +
-                ", email='" + email + '\'' +
-                ", phoneNumber='" + phoneNumber + '\'' +
-                ", deliveryAddress='" + deliveryAdress + '\'' +
-                ", avatar='" + avatar + '\'' +
-                ", enabled=" + enabled +
-                ", activationCode='" + activationCode + '\'' +
-                '}';
-    }
+
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = {CascadeType.DETACH, CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     List<Review> reviewList;
     @ManyToMany(fetch = FetchType.EAGER,cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})

@@ -8,6 +8,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import vn.ducbao.springboot.webbansach_backend.dto.request.CartItemRequest;
 import vn.ducbao.springboot.webbansach_backend.dto.response.CartItemResponse;
+import vn.ducbao.springboot.webbansach_backend.entity.Book;
+import vn.ducbao.springboot.webbansach_backend.entity.CartItem;
+import vn.ducbao.springboot.webbansach_backend.entity.User;
+import vn.ducbao.springboot.webbansach_backend.repository.BookRepository;
+import vn.ducbao.springboot.webbansach_backend.repository.CartItemRepository;
+import vn.ducbao.springboot.webbansach_backend.repository.UserRepository;
 import vn.ducbao.springboot.webbansach_backend.service.redis.BaseRedisService;
 
 import java.util.*;
@@ -17,6 +23,9 @@ import java.util.*;
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class CartRedisServiceImpl implements CartRedisService {
     BaseRedisService baseRedisService;
+    CartItemRepository cartItemRepository;
+    UserRepository userRepository;
+    BookRepository bookRepository;
     @NonFinal
     @Value("${spring.cart.id.prefix}")
     String cartIdPrefix;
@@ -30,16 +39,20 @@ public class CartRedisServiceImpl implements CartRedisService {
     public void addtoCart(int userId, List<CartItemRequest> cartItems) {
         String fieldKey;
         String userid = String.valueOf(userId);
+        User user = userRepository.findById(userId).get();
         int updateQuantity;
         for(CartItemRequest cartItem : cartItems) {
-            fieldKey = ID_PRODUCT + cartItem.getProductId();
+            Book book = bookRepository.findById(cartItem.getIdBook()).get();
+            fieldKey = ID_PRODUCT + cartItem.getIdBook();
             if(baseRedisService.hashExists(userid, fieldKey)){
                 updateQuantity =(Integer)baseRedisService.hashGet(userid, fieldKey) + cartItem.getQuantity();
             }else {
                 updateQuantity = cartItem.getQuantity();
             }
             baseRedisService.hashSet(userid, fieldKey, updateQuantity);
+            cartItemRepository.save(new CartItem( cartItem.getQuantity(),book, user));
         }
+
         baseRedisService.setTimeToLive(userid, CART_TIME_OUT);
     }
 
@@ -48,11 +61,14 @@ public class CartRedisServiceImpl implements CartRedisService {
         String fieldKey;
         String userid = String.valueOf(userId);
 //        List<String> fieldsKey = new ArrayList<>();
+        User user = userRepository.findById(userId).get();
         for(CartItemRequest cartItem : cartItems) {
-            fieldKey = ID_PRODUCT + cartItem.getProductId();
+            Book book = bookRepository.findById(cartItem.getIdBook()).get();
+            fieldKey = ID_PRODUCT + cartItem.getIdBook();
 //            fieldsKey.add(fieldKey);
             baseRedisService.delete(userid, fieldKey);
             baseRedisService.hashSet(userid, fieldKey, cartItem.getQuantity());
+            cartItemRepository.save(new CartItem( cartItem.getQuantity(),book, user));
         }
         //baseRedisService.delete(userid, fieldsKey);
         baseRedisService.setTimeToLive(userid, CART_TIME_OUT);
@@ -60,7 +76,7 @@ public class CartRedisServiceImpl implements CartRedisService {
 
     @Override
     public void deleteProductInCart(int userId, CartItemRequest cartItemRequest){
-        String fieldKey = ID_PRODUCT + cartItemRequest.getProductId();
+        String fieldKey = ID_PRODUCT + cartItemRequest.getIdBook();
         String userid = String.valueOf(userId);
         baseRedisService.delete(userid, fieldKey);
     }
@@ -69,6 +85,16 @@ public class CartRedisServiceImpl implements CartRedisService {
     public List<CartItemResponse> getProductsInCart(int userId) {
         String userid = String.valueOf(userId);
         Map<String, Object> product = baseRedisService.getField(userid);
+        if(product == null || product.isEmpty()){
+            List<CartItem> cartItemResponses =  cartItemRepository.findByUserId(userId);
+            product = new HashMap<>();
+            for(CartItem cartItem : cartItemResponses){
+                String fieldKey = ID_PRODUCT + cartItem.getBook().getIdBook();
+                product.put(fieldKey, cartItem.getQuantity());
+                baseRedisService.hashSet(userid, fieldKey, cartItem.getQuantity());
+            }
+            baseRedisService.setTimeToLive(userid, CART_TIME_OUT);
+        }
         return convertToCartItemResponseList(product);
     }
 

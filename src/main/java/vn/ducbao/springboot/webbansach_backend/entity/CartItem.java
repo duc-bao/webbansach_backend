@@ -24,6 +24,12 @@ public class CartItem {
     @JoinColumn(name = "id_user", nullable = false)
     private User user;
 
+    public CartItem(int quantity, Book book, User user) {
+        this.quantity = quantity;
+        this.book = book;
+        this.user = user;
+    }
+
     @Override
     public String toString() {
         return "CartItem{" +
