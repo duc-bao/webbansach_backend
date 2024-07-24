@@ -6,16 +6,16 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import vn.ducbao.springboot.webbansach_backend.repository.RoleRepository;
-import vn.ducbao.springboot.webbansach_backend.repository.UserRepository;
 import vn.ducbao.springboot.webbansach_backend.entity.Role;
 import vn.ducbao.springboot.webbansach_backend.entity.User;
+import vn.ducbao.springboot.webbansach_backend.repository.RoleRepository;
+import vn.ducbao.springboot.webbansach_backend.repository.UserRepository;
 
 import java.util.Collection;
 import java.util.stream.Collectors;
 
 @Service
-public class UserSecurityServiceImpl implements UserSecurityService{
+public class UserSecurityServiceImpl implements UserSecurityService {
     @Autowired
     private UserRepository userRepository;
     @Autowired
@@ -30,7 +30,7 @@ public class UserSecurityServiceImpl implements UserSecurityService{
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = findByUsername(username);
-        if(user == null) {
+        if (user == null) {
             throw new UsernameNotFoundException("Tài khoản không tồn tại!");
         }
 

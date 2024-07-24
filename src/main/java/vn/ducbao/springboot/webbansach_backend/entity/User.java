@@ -9,11 +9,11 @@ import java.util.List;
 @Data
 @Entity
 @Table(name = "user")
-public class User  {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_user")
-    private int idUser;
+public class User extends  AbstractEntity  {
+//    @Id
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
+//    @Column(name = "id_user")
+//    private int idUser;
     @Column(name = "first_name", length = 256)
     private String firstName;
     @Column(name = "last_name", length = 256)

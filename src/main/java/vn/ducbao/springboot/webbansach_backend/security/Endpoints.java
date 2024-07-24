@@ -54,7 +54,7 @@ public class Endpoints {
             "/review/update-review",
             "/order/update-order",
             "/cart-item/update-cart",
-            "/cart-item/update/*"
+            "/cart-item/update/*/*"
     };
     public  static  final  String[] ADMIN_ENDPOINT = {
            "/cart-items/**",
