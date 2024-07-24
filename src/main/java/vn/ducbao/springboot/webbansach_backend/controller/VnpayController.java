@@ -1,22 +1,25 @@
 package vn.ducbao.springboot.webbansach_backend.controller;
 
-import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import vn.ducbao.springboot.webbansach_backend.config.VnpayConfig;
-
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import jakarta.servlet.http.HttpServletRequest;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import vn.ducbao.springboot.webbansach_backend.config.VnpayConfig;
+
 @RestController
 @RequestMapping("/vnpay")
 public class VnpayController {
     @PostMapping("/create-payment")
-    public ResponseEntity<?> createPayment(HttpServletRequest request, @RequestParam("amount") double  amountRequest) throws UnsupportedEncodingException {
+    public ResponseEntity<?> createPayment(HttpServletRequest request, @RequestParam("amount") double amountRequest)
+            throws UnsupportedEncodingException {
         String orderType = "other";
         long amount = (long) (amountRequest * 100);
         String vnp_TxnRef = VnpayConfig.getRandomNumber(8);
@@ -54,11 +57,11 @@ public class VnpayController {
             String fieldName = (String) itr.next();
             String fieldValue = (String) vnp_Params.get(fieldName);
             if ((fieldValue != null) && (fieldValue.length() > 0)) {
-                //Build hash data
+                // Build hash data
                 hashData.append(fieldName);
                 hashData.append('=');
                 hashData.append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString()));
-                //Build query
+                // Build query
                 query.append(URLEncoder.encode(fieldName, StandardCharsets.US_ASCII.toString()));
                 query.append('=');
                 query.append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString()));
@@ -75,8 +78,9 @@ public class VnpayController {
 
         return ResponseEntity.status(HttpStatus.OK).body(paymentUrl);
     }
+
     @GetMapping("/payment/infor")
-    public ResponseEntity<?> paymentSuccess(@RequestParam(value =  "vnp_ResponseCode") String status){
+    public ResponseEntity<?> paymentSuccess(@RequestParam(value = "vnp_ResponseCode") String status) {
         if (status.equals("00")) {
             return ResponseEntity.ok("redirect:/success");
         } else {

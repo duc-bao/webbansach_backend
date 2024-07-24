@@ -1,9 +1,10 @@
 package vn.ducbao.springboot.webbansach_backend.security;
 
+import java.util.Arrays;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -16,12 +17,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
-import vn.ducbao.springboot.webbansach_backend.entity.User;
+
 import vn.ducbao.springboot.webbansach_backend.service.UserSecurityService;
 import vn.ducbao.springboot.webbansach_backend.service.jwt.JwtFilter;
-import vn.ducbao.springboot.webbansach_backend.service.user.UserService;
-
-import java.util.Arrays;
 
 @Configuration
 public class SecurityConfiguration {
@@ -45,17 +43,22 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         // Cấu hình phân quyền cho endpoint
-        http.authorizeHttpRequests(
-                config -> config
-                        .requestMatchers(HttpMethod.GET, Endpoints.PUBLIC_GET_ENDPOINT).permitAll()
-                        .requestMatchers(HttpMethod.POST, Endpoints.PUBLIC_POST_ENDPOINT).permitAll()
-                        .requestMatchers(HttpMethod.PUT, Endpoints.PUBLIC_PUT_ENDPOINT).permitAll()
-                        .requestMatchers(HttpMethod.DELETE, Endpoints.PUBLIC_DELETE_ENDPOINT).permitAll()
-                       .requestMatchers(HttpMethod.GET, Endpoints.ADMIN_ENDPOINT).hasAuthority("ADMIN")
-                        .requestMatchers(HttpMethod.POST, Endpoints.ADMIN_ENDPOINT).hasAuthority("ADMIN")
-                       .requestMatchers(HttpMethod.PUT, Endpoints.ADMIN_ENDPOINT).hasAuthority("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, Endpoints.ADMIN_ENDPOINT).hasAuthority("ADMIN")
-        );
+        http.authorizeHttpRequests(config -> config.requestMatchers(HttpMethod.GET, Endpoints.PUBLIC_GET_ENDPOINT)
+                .permitAll()
+                .requestMatchers(HttpMethod.POST, Endpoints.PUBLIC_POST_ENDPOINT)
+                .permitAll()
+                .requestMatchers(HttpMethod.PUT, Endpoints.PUBLIC_PUT_ENDPOINT)
+                .permitAll()
+                .requestMatchers(HttpMethod.DELETE, Endpoints.PUBLIC_DELETE_ENDPOINT)
+                .permitAll()
+                .requestMatchers(HttpMethod.GET, Endpoints.ADMIN_ENDPOINT)
+                .hasAuthority("ADMIN")
+                .requestMatchers(HttpMethod.POST, Endpoints.ADMIN_ENDPOINT)
+                .hasAuthority("ADMIN")
+                .requestMatchers(HttpMethod.PUT, Endpoints.ADMIN_ENDPOINT)
+                .hasAuthority("ADMIN")
+                .requestMatchers(HttpMethod.DELETE, Endpoints.ADMIN_ENDPOINT)
+                .hasAuthority("ADMIN"));
         // Cấu hình cors
         http.cors(cors -> {
             cors.configurationSource(request -> {
@@ -76,11 +79,9 @@ public class SecurityConfiguration {
         return http.build();
     }
 
-    //Tạo authentication để JWT có thể quản lí
+    // Tạo authentication để JWT có thể quản lí
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
-
 }
-

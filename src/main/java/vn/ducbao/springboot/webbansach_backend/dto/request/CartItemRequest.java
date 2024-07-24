@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import vn.ducbao.springboot.webbansach_backend.entity.Book;
 
 @Data
 @AllArgsConstructor

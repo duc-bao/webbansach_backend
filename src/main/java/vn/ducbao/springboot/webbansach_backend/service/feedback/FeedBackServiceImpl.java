@@ -1,37 +1,44 @@
 package vn.ducbao.springboot.webbansach_backend.service.feedback;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
-import vn.ducbao.springboot.webbansach_backend.repository.FeedBackRepository;
-import vn.ducbao.springboot.webbansach_backend.repository.UserRepository;
-import vn.ducbao.springboot.webbansach_backend.entity.FeedBack;
-import vn.ducbao.springboot.webbansach_backend.entity.User;
-
-
 import java.sql.Date;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import vn.ducbao.springboot.webbansach_backend.entity.FeedBack;
+import vn.ducbao.springboot.webbansach_backend.entity.User;
+import vn.ducbao.springboot.webbansach_backend.repository.FeedBackRepository;
+import vn.ducbao.springboot.webbansach_backend.repository.UserRepository;
+
 @Service
-public class FeedBackServiceImpl implements FeedBackService{
+public class FeedBackServiceImpl implements FeedBackService {
     @Autowired
     private UserRepository userRepository;
+
     private final ObjectMapper objectMapper;
+
     @Autowired
     private FeedBackRepository feedBackRepository;
+
     public FeedBackServiceImpl(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
+
     public ResponseEntity<?> addFeedBack(JsonNode jsonNode) {
         try {
             User user = userRepository.findByUsername(formatStringByJson(String.valueOf(jsonNode.get("user"))));
             DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX");
-            Instant instant = Instant.from(dateTimeFormatter.parse(formatStringByJson(String.valueOf(jsonNode.get("dateCreated")))));
+            Instant instant = Instant.from(
+                    dateTimeFormatter.parse(formatStringByJson(String.valueOf(jsonNode.get("dateCreated")))));
             Date dateCreate = new Date(Date.from(instant).getTime());
-            FeedBack feedBack = FeedBack.builder().title(formatStringByJson(String.valueOf(jsonNode.get("title"))))
+            FeedBack feedBack = FeedBack.builder()
+                    .title(formatStringByJson(String.valueOf(jsonNode.get("title"))))
                     .comment(formatStringByJson(String.valueOf(jsonNode.get("comment"))))
                     .dateCreated(dateCreate)
                     .isReaded(false)
@@ -39,9 +46,9 @@ public class FeedBackServiceImpl implements FeedBackService{
                     .build();
             feedBackRepository.save(feedBack);
             return ResponseEntity.ok().build();
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
-            return  ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().build();
         }
     }
 
@@ -52,9 +59,9 @@ public class FeedBackServiceImpl implements FeedBackService{
             feedBack.setReaded(true);
             feedBackRepository.save(feedBack);
             return ResponseEntity.ok("Thành công");
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
-            return  ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().build();
         }
     }
 

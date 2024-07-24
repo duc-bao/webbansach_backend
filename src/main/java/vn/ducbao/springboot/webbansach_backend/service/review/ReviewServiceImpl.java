@@ -1,30 +1,37 @@
 package vn.ducbao.springboot.webbansach_backend.service.review;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.sql.Timestamp;
+import java.time.Instant;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import vn.ducbao.springboot.webbansach_backend.repository.*;
-import vn.ducbao.springboot.webbansach_backend.entity.*;
 
-import java.sql.Timestamp;
-import java.time.Instant;
-import java.util.List;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import vn.ducbao.springboot.webbansach_backend.entity.*;
+import vn.ducbao.springboot.webbansach_backend.repository.*;
 
 @Service
 public class ReviewServiceImpl implements ReviewService {
 
     private final ObjectMapper objectMapper;
+
     @Autowired
     private UserRepository userRepository;
+
     @Autowired
     private OrderRepository orderRepository;
+
     @Autowired
     private BookRepository bookRepository;
+
     @Autowired
     private OrderDetailRepository orderDetailRepository;
+
     @Autowired
     private ReviewRepository reviewRepository;
 
@@ -43,7 +50,7 @@ public class ReviewServiceImpl implements ReviewService {
             for (OrderDetail orderDetail : orderDetailList) {
                 if (orderDetail.getBook().getIdBook() == book.getIdBook()) {
                     Review review = reviewRepository.findReviewByOrderDetail(orderDetail);
-                    Review reviewReponse = new Review();// Trả review luôn bị lỗi không được, nên phải dùng cách này
+                    Review reviewReponse = new Review(); // Trả review luôn bị lỗi không được, nên phải dùng cách này
                     reviewReponse.setIdReview(review.getIdReview());
                     reviewReponse.setComment(review.getComment());
                     reviewReponse.setDateCreated(review.getDateCreated());
@@ -91,13 +98,13 @@ public class ReviewServiceImpl implements ReviewService {
                 }
             }
             // Set lại rating trung bình của quyển sách đó
-            List<Review> reviewList  = reviewRepository.findAll();
-            double sum = 0;// Tổng rating
-            int n = 0;// Số lượng rating
-            for(Review review : reviewList){
-                if(review.getBook().getIdBook() == idBook){
+            List<Review> reviewList = reviewRepository.findAll();
+            double sum = 0; // Tổng rating
+            int n = 0; // Số lượng rating
+            for (Review review : reviewList) {
+                if (review.getBook().getIdBook() == idBook) {
                     n++;
-                    sum+=review.getRatingPoint();
+                    sum += review.getRatingPoint();
                 }
             }
             double ratingAvg = sum / n;
@@ -108,21 +115,21 @@ public class ReviewServiceImpl implements ReviewService {
             return ResponseEntity.badRequest().build();
         }
         return ResponseEntity.ok().build();
-
     }
 
     @Override
     public ResponseEntity<?> updateReview(JsonNode jsonNode) {
-     try {
-            Review reviewResponese  = objectMapper.treeToValue(jsonNode, Review.class);
-            Review review = reviewRepository.findById(reviewResponese.getIdReview()).get();
+        try {
+            Review reviewResponese = objectMapper.treeToValue(jsonNode, Review.class);
+            Review review =
+                    reviewRepository.findById(reviewResponese.getIdReview()).get();
             review.setComment(reviewResponese.getComment());
             review.setRatingPoint(reviewResponese.getRatingPoint());
             reviewRepository.save(review);
-     }catch (Exception e){
-         e.printStackTrace();
-         return ResponseEntity.badRequest().build();
-     }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().build();
+        }
         return ResponseEntity.ok().build();
     }
 

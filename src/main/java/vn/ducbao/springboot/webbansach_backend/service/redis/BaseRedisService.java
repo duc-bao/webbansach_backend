@@ -9,11 +9,13 @@ public interface BaseRedisService {
     void set(String key, Object value);
     // Xet du lieu thoi gian ton tai
     void setTimeToLive(String key, long timeInMiliisecond);
+
     void hashSet(String key, String field, Object value);
     // kiem tra xem co ton tai ko
     boolean hashExists(String key, String field);
     // Lay gia tri
     Object get(String key);
+
     public Map<String, Object> getField(String key);
 
     Object hashGet(String key, String field);

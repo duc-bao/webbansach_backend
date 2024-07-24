@@ -1,11 +1,12 @@
 package vn.ducbao.springboot.webbansach_backend.entity;
 
-import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-
 import java.io.Serializable;
 import java.util.Date;
+
+import jakarta.persistence.*;
+
+import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 @Setter
@@ -14,9 +15,9 @@ public abstract class AbstractEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(updatable = false, nullable = false)
-    private int  id;
+    private int id;
+
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "date_create")
-    private Date  dateCreate = new Date();
-
+    private Date dateCreate = new Date();
 }

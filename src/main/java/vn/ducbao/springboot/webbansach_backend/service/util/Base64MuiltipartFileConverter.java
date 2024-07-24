@@ -1,11 +1,11 @@
 package vn.ducbao.springboot.webbansach_backend.service.util;
 
-import org.springframework.core.io.Resource;
-import org.springframework.web.multipart.MultipartFile;
-
 import java.io.*;
 import java.nio.file.Path;
 import java.util.Base64;
+
+import org.springframework.core.io.Resource;
+import org.springframework.web.multipart.MultipartFile;
 
 public class Base64MuiltipartFileConverter {
     public static MultipartFile convert(String base64String) {
@@ -96,5 +96,4 @@ public class Base64MuiltipartFileConverter {
             return false;
         }
     }
-
 }
