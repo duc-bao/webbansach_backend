@@ -1,7 +1,7 @@
 package vn.ducbao.springboot.webbansach_backend.security;
 
 public class Endpoints {
-    public static final String endpoint_fe = "http://localhost:5906";
+    public static final String endpoint_fe = "http://localhost:3000";
     public static final String[] PUBLIC_GET_ENDPOINT = {
         "/books",
         "/books/**",
@@ -24,7 +24,8 @@ public class Endpoints {
         "/favorite-book/get-favorite-book/*",
         "/feedbacks/**",
         "/vnpay/**",
-        "/cart-item/get/*"
+        "/cart-item/get/*",
+         "/vnpay/payment_info"
     };
     public static final String[] PUBLIC_POST_ENDPOINT = {
         "/user/register",

@@ -79,12 +79,55 @@ public class VnpayController {
         return ResponseEntity.status(HttpStatus.OK).body(paymentUrl);
     }
 
-    @GetMapping("/payment/infor")
-    public ResponseEntity<?> paymentSuccess(@RequestParam(value = "vnp_ResponseCode") String status) {
-        if (status.equals("00")) {
-            return ResponseEntity.ok("redirect:/success");
-        } else {
-            return ResponseEntity.badRequest().build();
+    @GetMapping("/payment_info")
+    public ResponseEntity<?> paymentSuccess(HttpServletRequest request) throws UnsupportedEncodingException {
+        Map<String, String> response = new HashMap<>();
+        Map fields = new HashMap();
+        for (Enumeration params = request.getParameterNames(); params.hasMoreElements();) {
+            String fieldName = (String) params.nextElement();
+            String fieldValue = request.getParameter(fieldName);
+            if ((fieldValue != null) && (fieldValue.length() > 0)) {
+                fields.put(fieldName, fieldValue);
+            }
         }
+        String vnp_SecureHash = request.getParameter("vnp_SecureHash");
+        if (fields.containsKey("vnp_SecureHashType")) {
+            fields.remove("vnp_SecureHashType");
+        }
+        if (fields.containsKey("vnp_SecureHash")) {
+            fields.remove("vnp_SecureHash");
+        }
+        List<String> fieldNames = new ArrayList<>(fields.keySet());
+        Collections.sort(fieldNames);
+
+        StringBuilder hashData = new StringBuilder();
+        for (String fieldName : fieldNames) {
+            String fieldValue = (String) fields.get(fieldName);
+            if ((fieldValue != null) && (fieldValue.length() > 0)) {
+                hashData.append(fieldName);
+                hashData.append('=');
+                hashData.append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString()));
+                hashData.append('&');
+            }
+        }
+
+        // Remove the last '&' character
+        if (hashData.length() > 0) {
+            hashData.deleteCharAt(hashData.length() - 1);
+        }
+
+        String signValue = VnpayConfig.hmacSHA512(VnpayConfig.secretKey, hashData.toString());
+
+        if (signValue.equals(vnp_SecureHash)) {
+            String vnp_ResponseCode = request.getParameter("vnp_ResponseCode");
+            if ("00".equals(vnp_ResponseCode)) {
+                response.put("status", "success");
+            } else {
+                response.put("status", "success");
+            }
+        } else {
+            response.put("status", "invalid_signature");
+        }
+        return ResponseEntity.ok(response);
     }
 }
