@@ -5,6 +5,8 @@ import java.util.Date;
 
 import jakarta.persistence.*;
 
+import org.springframework.data.annotation.CreatedDate;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,6 +20,7 @@ public abstract class AbstractEntity implements Serializable {
     private int id;
 
     @Temporal(TemporalType.TIMESTAMP)
+    @CreatedDate
     @Column(name = "date_create")
     private Date dateCreate = new Date();
 }

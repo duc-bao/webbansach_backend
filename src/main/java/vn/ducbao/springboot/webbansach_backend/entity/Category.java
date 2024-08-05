@@ -4,6 +4,9 @@ import java.util.List;
 
 import jakarta.persistence.*;
 
+import org.springframework.data.elasticsearch.annotations.Field;
+import org.springframework.data.elasticsearch.annotations.FieldType;
+
 import lombok.Data;
 
 @Data
@@ -16,6 +19,7 @@ public class Category {
     private int idCategory;
 
     @Column(name = "name_category")
+//    @Field(type = FieldType.Text)
     private String nameCategory;
 
     @ManyToMany(

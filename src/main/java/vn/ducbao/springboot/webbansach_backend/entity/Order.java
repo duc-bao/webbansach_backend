@@ -5,6 +5,8 @@ import java.util.List;
 
 import jakarta.persistence.*;
 
+import org.springframework.data.annotation.CreatedDate;
+
 import lombok.Data;
 
 @Data
@@ -17,6 +19,7 @@ public class Order {
     private int idOrder;
 
     @Column(name = "date_created")
+    @CreatedDate
     private Date dateOrder;
 
     @Column(name = "purchase_address")

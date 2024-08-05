@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import vn.ducbao.springboot.webbansach_backend.config.VnpayConfig;
+import vn.ducbao.springboot.webbansach_backend.dto.response.VNPAYResponse;
 
 @RestController
 @RequestMapping("/vnpay")
@@ -81,9 +82,8 @@ public class VnpayController {
 
     @GetMapping("/payment_info")
     public ResponseEntity<?> paymentSuccess(HttpServletRequest request) throws UnsupportedEncodingException {
-        Map<String, String> response = new HashMap<>();
         Map fields = new HashMap();
-        for (Enumeration params = request.getParameterNames(); params.hasMoreElements();) {
+        for (Enumeration params = request.getParameterNames(); params.hasMoreElements(); ) {
             String fieldName = (String) params.nextElement();
             String fieldValue = request.getParameter(fieldName);
             if ((fieldValue != null) && (fieldValue.length() > 0)) {
@@ -121,13 +121,13 @@ public class VnpayController {
         if (signValue.equals(vnp_SecureHash)) {
             String vnp_ResponseCode = request.getParameter("vnp_ResponseCode");
             if ("00".equals(vnp_ResponseCode)) {
-                response.put("status", "success");
+                return ResponseEntity.ok(
+                        VNPAYResponse.builder().status("success").build());
             } else {
-                response.put("status", "success");
+                return ResponseEntity.ok(
+                        VNPAYResponse.builder().status("failed").build());
             }
-        } else {
-            response.put("status", "invalid_signature");
         }
-        return ResponseEntity.ok(response);
+        return ResponseEntity.badRequest().build();
     }
 }

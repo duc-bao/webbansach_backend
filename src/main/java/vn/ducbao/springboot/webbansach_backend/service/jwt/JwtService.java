@@ -7,7 +7,6 @@ import java.util.function.Function;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
@@ -20,14 +19,14 @@ import vn.ducbao.springboot.webbansach_backend.service.UserSecurityService;
 
 @Component
 public class JwtService {
-    @Value("${spring.token.key}")
-    private String SECRET;
+    //    @Value("${spring.token.key}")
+    private String SECRET = "MTIzNDU2NDU5OThEMzIxM0F6eGMzNTE2NTQzMjEzMjE2NTQ5OHEzMTNhMnMxZDMyMnp4M2MyMQA==";
 
-    @Value("${spring.token.expireToken}")
-    private long expireExpiraToken;
+    //    @Value("${spring.token.expireToken}")
+    private long expireExpiraToken = 200000;
 
-    @Value("${spring.token.expireRefreshToken}")
-    private long expireRefreshToken;
+    //    @Value("${spring.token.expireRefreshToken}")
+    private long expireRefreshToken = 550000000;
 
     @Autowired
     private UserSecurityService userService;

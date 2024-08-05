@@ -3,6 +3,8 @@ package vn.ducbao.springboot.webbansach_backend.config;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import org.modelmapper.ModelMapper;
+import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,6 +32,7 @@ public class RedisConfig {
         RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration();
         redisStandaloneConfiguration.setHostName(redisHostname);
         redisStandaloneConfiguration.setPort(port);
+        redisStandaloneConfiguration.setPassword("2904");
         return new JedisConnectionFactory(redisStandaloneConfiguration);
     }
 
@@ -56,5 +59,12 @@ public class RedisConfig {
         simpleModule.addSerializer(LocalDateTime.class, new LocalDateTimeSerializer(DateTimeFormatter.ISO_DATE_TIME));
         objectMapper.registerModule(simpleModule);
         return objectMapper;
+    }
+    @Bean
+    public ModelMapper modelMapper() {
+        // Tạo object và cấu hình
+        ModelMapper modelMapper = new ModelMapper();
+        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+        return modelMapper;
     }
 }

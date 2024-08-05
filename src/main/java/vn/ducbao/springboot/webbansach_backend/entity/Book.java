@@ -9,7 +9,7 @@ import lombok.Data;
 @Data
 @Entity
 @Table(name = "book")
-public class Book {
+public class Book  {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_book")
@@ -69,25 +69,4 @@ public class Book {
 
     @OneToMany(mappedBy = "book", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<CartItem> listCartItems;
-
-    @Override
-    public String toString() {
-        return "Book{" + "idBook="
-                + idBook + ", name='"
-                + nameBook + '\'' + ", author='"
-                + author + '\'' + ", ISBN='"
-                + ISBN + '\'' + ", listPrice="
-                + listPrice + ", sellPrice="
-                + sellPrice + ", quantity="
-                + quantity + ", description='"
-                + description + '\'' + ", avgRating="
-                + avgRating + ", soldQuantity="
-                + soldQuantity + ", discountPercent="
-                + discountPercent + ", categoryList="
-                + categoryList + ", imageList="
-                + imageList + ", orderDetailList="
-                + orderDetailList + ", reviewList="
-                + reviewList + ", favoriteBookList="
-                + favoriteBookList + '}';
-    }
 }
