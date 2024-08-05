@@ -1,5 +1,6 @@
 package vn.ducbao.springboot.webbansach_backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 
 import lombok.AllArgsConstructor;
@@ -11,6 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Entity
 @Table(name = "cart_item")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class CartItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,10 +34,5 @@ public class CartItem {
         this.quantity = quantity;
         this.book = book;
         this.user = user;
-    }
-
-    @Override
-    public String toString() {
-        return "CartItem{" + "idCart=" + idCart + ", quantity=" + quantity + ", book=" + book + ", user=" + user + '}';
     }
 }

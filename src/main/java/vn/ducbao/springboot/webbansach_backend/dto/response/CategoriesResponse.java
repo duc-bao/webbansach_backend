@@ -13,6 +13,6 @@ public class CategoriesResponse {
     @Field(type = FieldType.Integer)
     private int idCategory;
 
-    @Field(type = FieldType.Text)
+    @Field(type = FieldType.Keyword)
     private String nameCategory;
 }

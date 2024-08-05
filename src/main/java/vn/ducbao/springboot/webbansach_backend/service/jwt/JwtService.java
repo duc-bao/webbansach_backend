@@ -23,10 +23,10 @@ public class JwtService {
     private String SECRET = "MTIzNDU2NDU5OThEMzIxM0F6eGMzNTE2NTQzMjEzMjE2NTQ5OHEzMTNhMnMxZDMyMnp4M2MyMQA==";
 
     //    @Value("${spring.token.expireToken}")
-    private long expireExpiraToken = 200000;
+    private long expireExpiraToken = 604800000;
 
     //    @Value("${spring.token.expireRefreshToken}")
-    private long expireRefreshToken = 550000000;
+    private long expireRefreshToken = 5500000000L;
 
     @Autowired
     private UserSecurityService userService;

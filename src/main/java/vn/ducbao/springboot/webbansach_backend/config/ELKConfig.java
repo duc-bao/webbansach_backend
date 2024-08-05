@@ -18,9 +18,6 @@ import co.elastic.clients.transport.rest_client.RestClientTransport;
 
 @Configuration
 @EnableElasticsearchRepositories
-
-////@EnableElasticsearchRepositories(basePackages = "vn.ducbao.springboot.webbansach_backend.repository.elk")
-//@ComponentScan(basePackages = {"vn.ducbao.springboot.webbansach_backend.service"})
 public class ELKConfig {
     @Bean
     public RestClient getRestClient() {
@@ -42,12 +39,5 @@ public class ELKConfig {
         return client;
     }
 
-//
-//    @Bean
-//    public ModelMapper modelMapper() {
-//        // Tạo object và cấu hình
-//        ModelMapper modelMapper = new ModelMapper();
-//        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
-//        return modelMapper;
-//    }
+
 }
