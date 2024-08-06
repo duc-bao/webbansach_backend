@@ -19,8 +19,11 @@ import org.springframework.util.StringUtils;
 import vn.ducbao.springboot.webbansach_backend.dto.request.SearchFilter;
 import vn.ducbao.springboot.webbansach_backend.dto.response.PageResponse;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
@@ -60,8 +63,10 @@ public class ElasticsearchBaseImpl<T> {
         if(StringUtils.hasText(searchCriteria.getKeyword())){
             boolQuery.must(buildMultiMatchQuery(searchCriteria));
         }
-        if(searchCriteria.getSearchFilters() != null && !searchCriteria.getSearchFilters().isEmpty()){
-            for(SearchFilter searchFilter : searchCriteria.getSearchFilters()){
+        if(searchCriteria.getSearchFilters() != null){
+            List<SearchFilter> searchFilters = new ArrayList<>();
+            searchFilters.add( handleFilter(searchCriteria.getSearchFilters(), searchCriteria));
+            for(SearchFilter searchFilter : searchFilters){
                 if(searchCriteria.getVALID_KEY_FIELD().contains(searchFilter.getKey())){
                     addFilter(boolQuery, searchFilter);
                 }else {
@@ -90,6 +95,45 @@ public class ElasticsearchBaseImpl<T> {
         );
     }
 
+    private SearchFilter handleFilter(String[] searchFilters, SearchCriteria searchCriteria) {
+        for(String searchFilter : searchFilters){
+            if(StringUtils.hasText(searchFilter)){
+                Pattern pattern = Pattern.compile("(\\w+(?:\\.\\w+)*)\\(([^)]*)\\)=([^,]+)");
+                Matcher matcher = pattern.matcher(searchFilter);
+                if(matcher.find()){
+                    String key = matcher.group(1);
+                    FilterOperator operator = converOperator(matcher.group(2));
+                    String value = matcher.group(3);
+                    if(searchCriteria.getVALID_KEY_FIELD().contains(key)){
+                        return  new SearchFilter(key, operator, value);
+                    }else {
+                        throw new IllegalArgumentException("Invalid search filter: " + searchFilter);
+                    }
+                }else {
+                    throw new IllegalArgumentException("Invalid search filter: " + searchFilter);
+                }
+            }
+        }
+        throw new IllegalArgumentException("No valid search filter found.");
+    }
+
+    private FilterOperator converOperator(String operator) {
+        switch (operator) {
+            case ">":
+                return FilterOperator.GREATER_THAN;
+            case "<":
+                return FilterOperator.LESS_THAN;
+            case "=":
+                return FilterOperator.EQUALS;
+            case "IN":
+                return FilterOperator.IN;
+            case "LIKE":
+                return FilterOperator.LIKE;
+            default:
+                throw new IllegalArgumentException("Unsupported operator: " + operator);
+        }
+    }
+
     private void addFilter(BoolQuery.Builder boolQuery, SearchFilter searchFilter) {
         Query filterQuery = null;
         switch (searchFilter.getOperation()){
@@ -106,7 +150,7 @@ public class ElasticsearchBaseImpl<T> {
     }
 
     private Query buildMultiMatchQuery(SearchCriteria searchCriteria) {
-            return MultiMatchQuery.of(m -> m.fields(searchCriteria.getSearchFields())
+            return MultiMatchQuery.of(m -> m.fields(searchCriteria.getVALID_FIELD_SEARCH())
                     .query(searchCriteria.getKeyword())
                     .fuzziness("AUTO")
                     .operator(Operator.Or)

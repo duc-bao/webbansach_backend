@@ -14,8 +14,7 @@ import java.util.Set;
 public class SearchCriteria {
     private String indexName;
     private String keyword;
-    private List<String> searchFields;
-    private List<SearchFilter> searchFilters;
+    private String[] searchFilters;
     private String sortBy;
     private int pageNo;
     private int pageSize;

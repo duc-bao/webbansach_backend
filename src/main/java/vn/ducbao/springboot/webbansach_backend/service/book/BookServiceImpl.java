@@ -44,6 +44,8 @@ import vn.ducbao.springboot.webbansach_backend.repository.BookRepository;
 import vn.ducbao.springboot.webbansach_backend.repository.CategoryRepository;
 import vn.ducbao.springboot.webbansach_backend.repository.ImageRepository;
 import vn.ducbao.springboot.webbansach_backend.repository.elk.BookElkRepository;
+import vn.ducbao.springboot.webbansach_backend.service.elk.ElasticsearchBaseImpl;
+import vn.ducbao.springboot.webbansach_backend.service.elk.SearchCriteria;
 import vn.ducbao.springboot.webbansach_backend.service.image.ImageService;
 import vn.ducbao.springboot.webbansach_backend.service.util.Base64MuiltipartFileConverter;
 
@@ -68,12 +70,13 @@ public class BookServiceImpl implements BookService {
     @Autowired
     private BookElkRepository bookElkRepository;
 
+//    @Autowired
+//    private ElasticsearchClient elasticsearchClient;
     @Autowired
-    private ElasticsearchClient elasticsearchClient;
-
+    private ElasticsearchBaseImpl<BookListResponse> elasticsearchBaseImpl;
     private static final Set<String> VALID_KEYS =
             Set.of("nameBook", "author", "sellPrice", "categoryList.nameCategory");
-
+    private static  final List<String> VALID_KEYWORD_SEARCH = Arrays.asList("nameBook", "author", "categoryList.nameCategory");
     public final ObjectMapper objectMapper;
     public final ModelMapper modelMapper;
 
@@ -81,7 +84,19 @@ public class BookServiceImpl implements BookService {
         this.objectMapper = objectMapper;
         this.modelMapper = modelMapper;
     }
-
+    @Override
+    public PageResponse<?> searchElk(int pageNo, int pageSize, String sortBy, String[] filter, String keyword) {
+        SearchCriteria searchCriteria = SearchCriteria.builder()
+                .indexName("book")
+                .keyword(keyword)
+                .pageSize(pageSize)
+                .pageNo(pageNo)
+                .sortBy(sortBy)
+                .VALID_KEY_FIELD(VALID_KEYS)
+                .searchFilters(filter)
+                .build();
+        return elasticsearchBaseImpl.search(searchCriteria, BookListResponse.class);
+    }
 //    @Override
 //    public PageResponse<?> searchElk(int pageNo, int pageSize, String sortBy, String[] filter, String keyword) {
 //        BoolQuery.Builder builder = new BoolQuery.Builder();
@@ -368,10 +383,7 @@ public class BookServiceImpl implements BookService {
                 .build();
     }
 
-    @Override
-    public PageResponse<?> searchElk(int pageNo, int pageSize, String sortBy, String[] filter, String keyword) {
-        return null;
-    }
+
 
     @Override
     public ResponseEntity<?> getAlla() {
