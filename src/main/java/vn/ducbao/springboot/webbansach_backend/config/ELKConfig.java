@@ -2,13 +2,8 @@ package vn.ducbao.springboot.webbansach_backend.config;
 
 import org.apache.http.HttpHost;
 import org.elasticsearch.client.RestClient;
-import org.modelmapper.ModelMapper;
-import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
-import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
@@ -27,17 +22,13 @@ public class ELKConfig {
     }
 
     @Bean
-
     public ElasticsearchTransport getElasticsearchTransport() {
         return new RestClientTransport(getRestClient(), new JacksonJsonpMapper());
     }
 
     @Bean
-
     public ElasticsearchClient getElasticsearchClient() {
         ElasticsearchClient client = new ElasticsearchClient(getElasticsearchTransport());
         return client;
     }
-
-
 }

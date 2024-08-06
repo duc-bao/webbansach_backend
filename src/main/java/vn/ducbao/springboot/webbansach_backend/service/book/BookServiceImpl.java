@@ -8,7 +8,6 @@ import java.util.stream.Collectors;
 
 import jakarta.transaction.Transactional;
 
-import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +32,7 @@ import co.elastic.clients.elasticsearch._types.query_dsl.*;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.json.JsonData;
+import lombok.extern.slf4j.Slf4j;
 import vn.ducbao.springboot.webbansach_backend.dto.request.SearchFilter;
 import vn.ducbao.springboot.webbansach_backend.dto.response.BookListResponse;
 import vn.ducbao.springboot.webbansach_backend.dto.response.CategoriesResponse;
@@ -40,10 +40,10 @@ import vn.ducbao.springboot.webbansach_backend.dto.response.PageResponse;
 import vn.ducbao.springboot.webbansach_backend.entity.Book;
 import vn.ducbao.springboot.webbansach_backend.entity.Category;
 import vn.ducbao.springboot.webbansach_backend.entity.Image;
-import vn.ducbao.springboot.webbansach_backend.repository.elk.BookElkRepository;
 import vn.ducbao.springboot.webbansach_backend.repository.BookRepository;
 import vn.ducbao.springboot.webbansach_backend.repository.CategoryRepository;
 import vn.ducbao.springboot.webbansach_backend.repository.ImageRepository;
+import vn.ducbao.springboot.webbansach_backend.repository.elk.BookElkRepository;
 import vn.ducbao.springboot.webbansach_backend.service.image.ImageService;
 import vn.ducbao.springboot.webbansach_backend.service.util.Base64MuiltipartFileConverter;
 
@@ -52,6 +52,7 @@ import vn.ducbao.springboot.webbansach_backend.service.util.Base64MuiltipartFile
 public class BookServiceImpl implements BookService {
 
     private static final Logger log = LoggerFactory.getLogger(BookServiceImpl.class);
+
     @Autowired
     private BookRepository bookRepository;
 
@@ -72,8 +73,7 @@ public class BookServiceImpl implements BookService {
 
     private static final Set<String> VALID_KEYS =
             Set.of("nameBook", "author", "sellPrice", "categoryList.nameCategory");
-    //    @Autowired
-    //    private BookRedisService bookRedisService;
+
     public final ObjectMapper objectMapper;
     public final ModelMapper modelMapper;
 
@@ -89,7 +89,7 @@ public class BookServiceImpl implements BookService {
 
         if (keyword != null) {
             Query multiMatchQuery = MultiMatchQuery.of(
-                            m -> m.fields(Arrays.asList("nameBook", "author",  "categoryList.nameCategory"))
+                            m -> m.fields(Arrays.asList("nameBook", "author", "categoryList.nameCategory"))
                                     .query(keyword))
                     ._toQuery();
             builder.must(multiMatchQuery);
@@ -102,7 +102,8 @@ public class BookServiceImpl implements BookService {
                 Matcher matcher = pattern.matcher(filterStr);
                 if (matcher.find()) {
                     String key = matcher.group(1);
-                    String operator = matcher.group(2) != null ? matcher.group(2) : ":"; // default to "equals" if no operator
+                    String operator =
+                            matcher.group(2) != null ? matcher.group(2) : ":"; // default to "equals" if no operator
                     String value = matcher.group(3);
 
                     if (VALID_KEYS.contains(key)) {
@@ -124,7 +125,7 @@ public class BookServiceImpl implements BookService {
                 .sort(sortOptions != null ? List.of(sortOptions) : null)
                 .from(pageNo * pageSize)
                 .size(pageSize));
-        log.debug("Truy vấn chuối: "+ request.toString());
+        log.debug("Truy vấn chuối: " + request.toString());
         SearchResponse<BookListResponse> searchResponse;
         try {
             searchResponse = elasticsearchClient.search(request, BookListResponse.class);
@@ -140,7 +141,6 @@ public class BookServiceImpl implements BookService {
                 .total(searchResponse.hits().total().value())
                 .build();
     }
-
 
     private SortOptions getSortOptions(String sortBy) {
         if (sortBy != null) {
@@ -169,7 +169,7 @@ public class BookServiceImpl implements BookService {
                         ._toQuery();
                 break;
             case ":":
-              if ("categoryList.nameCategory".equals(searchFilter.getKey())) {
+                if ("categoryList.nameCategory".equals(searchFilter.getKey())) {
                     filterQuery = MatchPhraseQuery.of(
                                     m -> m.field("categoryList.nameCategory").query(searchFilter.getValue()))
                             ._toQuery();
@@ -367,15 +367,16 @@ public class BookServiceImpl implements BookService {
                 .size(books.getSize())
                 .build();
     }
+
     @Override
     public ResponseEntity<?> getAlla() {
         List<Book> books = bookRepository.findAll();
-        List<BookListResponse> bookListResponse = books.stream()
-                .map(book -> convertToResponse(book))
-                .collect(Collectors.toList());
+        List<BookListResponse> bookListResponse =
+                books.stream().map(book -> convertToResponse(book)).collect(Collectors.toList());
         bookElkRepository.saveAll(bookListResponse);
         return ResponseEntity.ok(bookListResponse);
     }
+
     public BookListResponse convertToResponse(Book book) {
         return BookListResponse.builder()
                 .idBook(book.getIdBook())
@@ -389,13 +390,16 @@ public class BookServiceImpl implements BookService {
                 .avgRating(book.getAvgRating())
                 .soldQuantity(book.getSoldQuantity())
                 .discountPercent(book.getDiscountPercent())
-                .categoryList(book.getCategoryList().stream().map(this::convertCategory).collect(Collectors.toList()))
+                .categoryList(book.getCategoryList().stream()
+                        .map(this::convertCategory)
+                        .collect(Collectors.toList()))
                 .build();
     }
 
     private CategoriesResponse convertCategory(Category category) {
         return new CategoriesResponse(category.getIdCategory(), category.getNameCategory());
     }
+
     public String formatStringByJson(String json) {
         return json.replace("\"", "");
     }

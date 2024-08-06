@@ -21,9 +21,9 @@ public class BookController {
     public PageResponse<?> searchBook(
             @RequestParam(defaultValue = "10", required = false, value = "pageSize") int pageSize,
             @RequestParam(defaultValue = "0", required = false, value = "pageNo") int pageNo,
-            @RequestParam( required = false, value = "sortBy", defaultValue = "idBook") String sortBy,
-            @RequestParam( required = false, value = "keyword") String search,
-            @RequestParam( required = false, value = "filter") String[] filter) {
+            @RequestParam(required = false, value = "sortBy", defaultValue = "idBook") String sortBy,
+            @RequestParam(required = false, value = "keyword") String search,
+            @RequestParam(required = false, value = "filter") String[] filter) {
         return bookService.searchElk(pageNo, pageSize, sortBy, filter, search);
     }
 

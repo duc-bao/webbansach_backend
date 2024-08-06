@@ -60,6 +60,7 @@ public class RedisConfig {
         objectMapper.registerModule(simpleModule);
         return objectMapper;
     }
+
     @Bean
     public ModelMapper modelMapper() {
         // Tạo object và cấu hình

@@ -9,7 +9,7 @@ import lombok.Data;
 @Data
 @Entity
 @Table(name = "book")
-public class Book  {
+public class Book {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_book")
@@ -32,7 +32,7 @@ public class Book  {
     private double sellPrice;
 
     @Column(name = "quantity")
-    int quantity;
+    private int quantity;
 
     @Column(name = "description")
     private String description;

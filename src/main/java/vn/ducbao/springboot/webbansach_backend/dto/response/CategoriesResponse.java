@@ -1,8 +1,9 @@
 package vn.ducbao.springboot.webbansach_backend.dto.response;
 
-import lombok.*;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
+
+import lombok.*;
 
 @Getter
 @Setter

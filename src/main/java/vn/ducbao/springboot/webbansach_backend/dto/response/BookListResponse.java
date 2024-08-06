@@ -2,14 +2,13 @@ package vn.ducbao.springboot.webbansach_backend.dto.response;
 
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import jakarta.persistence.Id;
-import lombok.*;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
-import vn.ducbao.springboot.webbansach_backend.entity.Category;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+import lombok.*;
 
 @Getter
 @AllArgsConstructor
@@ -20,7 +19,7 @@ import vn.ducbao.springboot.webbansach_backend.entity.Category;
 public class BookListResponse {
     @org.springframework.data.annotation.Id
     @Field(type = FieldType.Integer)
-    private int  idBook;
+    private int idBook;
 
     @Field(type = FieldType.Text)
     private String nameBook;
@@ -38,7 +37,7 @@ public class BookListResponse {
     private double sellPrice;
 
     @Field(type = FieldType.Integer)
-    int quantity;
+    private int quantity;
 
     @Field(type = FieldType.Text)
     private String description;
