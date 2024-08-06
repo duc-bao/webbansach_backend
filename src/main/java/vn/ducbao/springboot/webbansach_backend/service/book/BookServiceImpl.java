@@ -82,106 +82,106 @@ public class BookServiceImpl implements BookService {
         this.modelMapper = modelMapper;
     }
 
-    @Override
-    public PageResponse<?> searchElk(int pageNo, int pageSize, String sortBy, String[] filter, String keyword) {
-        BoolQuery.Builder builder = new BoolQuery.Builder();
-        List<SearchFilter> searchFilters = new ArrayList<>();
+//    @Override
+//    public PageResponse<?> searchElk(int pageNo, int pageSize, String sortBy, String[] filter, String keyword) {
+//        BoolQuery.Builder builder = new BoolQuery.Builder();
+//        List<SearchFilter> searchFilters = new ArrayList<>();
+//
+//        if (keyword != null) {
+//            Query multiMatchQuery = MultiMatchQuery.of(
+//                            m -> m.fields(Arrays.asList("nameBook", "author", "categoryList.nameCategory"))
+//                                    .query(keyword))
+//                    ._toQuery();
+//            builder.must(multiMatchQuery);
+//        }
+//        // Sử lí map các filter
+//        if (filter != null) {
+//            for (String filterStr : filter) {
+//                // Regex :(\w+)\((\w+)\)=(.*)
+//                Pattern pattern = Pattern.compile("(\\w+(?:\\.\\w+)*)\\(([^)]*)\\)=([^,]+)");
+//                Matcher matcher = pattern.matcher(filterStr);
+//                if (matcher.find()) {
+//                    String key = matcher.group(1);
+//                    String operator =
+//                            matcher.group(2) != null ? matcher.group(2) : ":"; // default to "equals" if no operator
+//                    String value = matcher.group(3);
+//
+//                    if (VALID_KEYS.contains(key)) {
+//                        searchFilters.add(new SearchFilter(key, operator, value));
+//                    } else {
+//                        throw new IllegalArgumentException("Invalid Key: " + key);
+//                    }
+//                } else {
+//                    throw new IllegalArgumentException("Invalid filter format: " + filterStr);
+//                }
+//            }
+//            for (SearchFilter searchFilter : searchFilters) {
+//                applyFilter(builder, searchFilter);
+//            }
+//        }
+//        SortOptions sortOptions = getSortOptions(sortBy);
+//        SearchRequest request = SearchRequest.of(s -> s.index("book")
+//                .query(builder.build()._toQuery())
+//                .sort(sortOptions != null ? List.of(sortOptions) : null)
+//                .from(pageNo * pageSize)
+//                .size(pageSize));
+//        log.debug("Truy vấn chuối: " + request.toString());
+//        SearchResponse<BookListResponse> searchResponse;
+//        try {
+//            searchResponse = elasticsearchClient.search(request, BookListResponse.class);
+//        } catch (IOException e) {
+//            throw new RuntimeException("Error executing search request", e);
+//        }
+//        List<BookListResponse> result =
+//                searchResponse.hits().hits().stream().map(hit -> hit.source()).collect(Collectors.toList());
+//        return PageResponse.<BookListResponse>builder()
+//                .page(pageNo)
+//                .size(pageSize)
+//                .rows(result)
+//                .total(searchResponse.hits().total().value())
+//                .build();
+//    }
 
-        if (keyword != null) {
-            Query multiMatchQuery = MultiMatchQuery.of(
-                            m -> m.fields(Arrays.asList("nameBook", "author", "categoryList.nameCategory"))
-                                    .query(keyword))
-                    ._toQuery();
-            builder.must(multiMatchQuery);
-        }
-        // Sử lí map các filter
-        if (filter != null) {
-            for (String filterStr : filter) {
-                // Regex :(\w+)\((\w+)\)=(.*)
-                Pattern pattern = Pattern.compile("(\\w+(?:\\.\\w+)*)\\(([^)]*)\\)=([^,]+)");
-                Matcher matcher = pattern.matcher(filterStr);
-                if (matcher.find()) {
-                    String key = matcher.group(1);
-                    String operator =
-                            matcher.group(2) != null ? matcher.group(2) : ":"; // default to "equals" if no operator
-                    String value = matcher.group(3);
+//    private SortOptions getSortOptions(String sortBy) {
+//        if (sortBy != null) {
+//            if (sortBy.startsWith("-")) {
+//                String field = sortBy.substring(1); // Remove the "-" for the field name
+//                return SortOptions.of(s -> s.field(f -> f.field(field).order(SortOrder.Desc)));
+//            } else {
+//                return SortOptions.of(s -> s.field(f -> f.field(sortBy).order(SortOrder.Asc)));
+//            }
+//        }
+//        return null;
+//    }
 
-                    if (VALID_KEYS.contains(key)) {
-                        searchFilters.add(new SearchFilter(key, operator, value));
-                    } else {
-                        throw new IllegalArgumentException("Invalid Key: " + key);
-                    }
-                } else {
-                    throw new IllegalArgumentException("Invalid filter format: " + filterStr);
-                }
-            }
-            for (SearchFilter searchFilter : searchFilters) {
-                applyFilter(builder, searchFilter);
-            }
-        }
-        SortOptions sortOptions = getSortOptions(sortBy);
-        SearchRequest request = SearchRequest.of(s -> s.index("book")
-                .query(builder.build()._toQuery())
-                .sort(sortOptions != null ? List.of(sortOptions) : null)
-                .from(pageNo * pageSize)
-                .size(pageSize));
-        log.debug("Truy vấn chuối: " + request.toString());
-        SearchResponse<BookListResponse> searchResponse;
-        try {
-            searchResponse = elasticsearchClient.search(request, BookListResponse.class);
-        } catch (IOException e) {
-            throw new RuntimeException("Error executing search request", e);
-        }
-        List<BookListResponse> result =
-                searchResponse.hits().hits().stream().map(hit -> hit.source()).collect(Collectors.toList());
-        return PageResponse.<BookListResponse>builder()
-                .page(pageNo)
-                .size(pageSize)
-                .rows(result)
-                .total(searchResponse.hits().total().value())
-                .build();
-    }
-
-    private SortOptions getSortOptions(String sortBy) {
-        if (sortBy != null) {
-            if (sortBy.startsWith("-")) {
-                String field = sortBy.substring(1); // Remove the "-" for the field name
-                return SortOptions.of(s -> s.field(f -> f.field(field).order(SortOrder.Desc)));
-            } else {
-                return SortOptions.of(s -> s.field(f -> f.field(sortBy).order(SortOrder.Asc)));
-            }
-        }
-        return null;
-    }
-
-    private void applyFilter(BoolQuery.Builder boolQuery, SearchFilter searchFilter) {
-        Query filterQuery = null;
-        String field = searchFilter.getKey();
-        String operation = searchFilter.getOperation();
-        String value = searchFilter.getValue();
-        switch (operation) {
-            case "gte":
-                filterQuery = RangeQuery.of(r -> r.field(field).gte(JsonData.of(value)))
-                        ._toQuery();
-                break;
-            case "lte":
-                filterQuery = RangeQuery.of(r -> r.field(field).lte(JsonData.of(value)))
-                        ._toQuery();
-                break;
-            case ":":
-                if ("categoryList.nameCategory".equals(searchFilter.getKey())) {
-                    filterQuery = MatchPhraseQuery.of(
-                                    m -> m.field("categoryList.nameCategory").query(searchFilter.getValue()))
-                            ._toQuery();
-                } else {
-                    throw new IllegalArgumentException("Invalid Key: " + searchFilter.getKey());
-                }
-                break;
-            default:
-                throw new IllegalArgumentException("Unsupported operation: " + searchFilter.getOperation());
-        }
-        boolQuery.filter(filterQuery);
-    }
+//    private void applyFilter(BoolQuery.Builder boolQuery, SearchFilter searchFilter) {
+//        Query filterQuery = null;
+//        String field = searchFilter.getKey();
+//        String operation = searchFilter.getOperation();
+//        String value = searchFilter.getValue();
+//        switch (operation) {
+//            case "gte":
+//                filterQuery = RangeQuery.of(r -> r.field(field).gte(JsonData.of(value)))
+//                        ._toQuery();
+//                break;
+//            case "lte":
+//                filterQuery = RangeQuery.of(r -> r.field(field).lte(JsonData.of(value)))
+//                        ._toQuery();
+//                break;
+//            case ":":
+//                if ("categoryList.nameCategory".equals(searchFilter.getKey())) {
+//                    filterQuery = MatchPhraseQuery.of(
+//                                    m -> m.field("categoryList.nameCategory").query(searchFilter.getValue()))
+//                            ._toQuery();
+//                } else {
+//                    throw new IllegalArgumentException("Invalid Key: " + searchFilter.getKey());
+//                }
+//                break;
+//            default:
+//                throw new IllegalArgumentException("Unsupported operation: " + searchFilter.getOperation());
+//        }
+//        boolQuery.filter(filterQuery);
+//    }
 
     //    @Override
     //    public List<Book> getBook(String keyword, int categoryId, int page, int size) throws JsonProcessingException {
@@ -366,6 +366,11 @@ public class BookServiceImpl implements BookService {
                 .rows(bookList)
                 .size(books.getSize())
                 .build();
+    }
+
+    @Override
+    public PageResponse<?> searchElk(int pageNo, int pageSize, String sortBy, String[] filter, String keyword) {
+        return null;
     }
 
     @Override
