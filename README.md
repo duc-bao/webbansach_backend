@@ -25,9 +25,8 @@
    ```bash
    git clone [https://github.com/username/webbansach.git](https://github.com/duc-bao/webbansach_backend)
    cd webbansach
-2.**Chạy docker compose**
-  docker-compose up
-3. **THay đổi các thông số về database và cấu hình gửi email trong file application.propertites**
+2. **Chạy docker compose**: docker-compose up
+3. **Thay đổi các thông số về database và cấu hình gửi email trong file application.propertites**
 3. **Run dự án bằng Intellij**
 # Hy vọng file README này giúp bạn giới thiệu dự án `web ban sach` của mình một cách rõ ràng và đầy đủ!
 
@@ -41,7 +40,7 @@
 
 Bước 1.**Cài đặt pluggin**
  Cài đặt plugin ICU (nếu chưa có): *bin/elasticsearch-plugin install analysis-icu*
-Bước 2: **Tạo file cấu hình cho chỉ mục Index(BOOK)**:
+Bước 2: **Tạo file cấu hình cho chỉ mục Index(BOOK)** :
  ![image](https://github.com/user-attachments/assets/33709265-cb32-467e-94d9-fa9f4615e774)
  #### Giải thích:
  Chúng ta sẽ thực hiện điều này cấu hình cho chỉ mục Index VN_Analyzer với các filter là  "filter": ["lowercase", "asciifolding","vi_stop"]
