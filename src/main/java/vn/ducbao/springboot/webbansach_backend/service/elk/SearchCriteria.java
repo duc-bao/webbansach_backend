@@ -1,7 +1,9 @@
 package vn.ducbao.springboot.webbansach_backend.service.elk;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import vn.ducbao.springboot.webbansach_backend.dto.request.SearchFilter;
 
 import java.util.ArrayList;
@@ -11,6 +13,8 @@ import java.util.Set;
 
 @Data
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class SearchCriteria {
     private String indexName;
     private String keyword;
@@ -20,4 +24,11 @@ public class SearchCriteria {
     private int pageSize;
     private Set<String> VALID_KEY_FIELD = new HashSet<String>();
     private List<String> VALID_FIELD_SEARCH = new ArrayList<String>();
+    public String getKeyword() {
+        return keyword != null ? keyword : "";
+    }
+
+    public String[] getSearchFilters() {
+        return searchFilters != null ? searchFilters : new String[0];
+    }
 }

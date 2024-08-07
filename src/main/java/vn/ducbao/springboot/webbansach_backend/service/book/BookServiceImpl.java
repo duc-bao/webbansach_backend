@@ -6,6 +6,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 
 import org.modelmapper.ModelMapper;
@@ -72,11 +73,22 @@ public class BookServiceImpl implements BookService {
 
 //    @Autowired
 //    private ElasticsearchClient elasticsearchClient;
+
+    @PostConstruct
+    public void syncBooksToElasticsearch() {
+        List<Book> books = bookRepository.findAll();
+        List<BookListResponse> bookListResponses = books.stream()
+                .map(this::convertToResponse)
+                .collect(Collectors.toList());
+        bookElkRepository.saveAll(bookListResponses);
+        System.out.println("Đã đồng bộ " + bookListResponses.size() + " sách lên Elasticsearch.");
+    }
+
     @Autowired
     private ElasticsearchBaseImpl<BookListResponse> elasticsearchBaseImpl;
     private static final Set<String> VALID_KEYS =
             Set.of("nameBook", "author", "sellPrice", "categoryList.nameCategory");
-    private static  final List<String> VALID_KEYWORD_SEARCH = Arrays.asList("nameBook", "author", "categoryList.nameCategory");
+    private static  final List<String> VALID_KEYWORD_SEARCH = Arrays.asList("nameBook");
     public final ObjectMapper objectMapper;
     public final ModelMapper modelMapper;
 
@@ -93,6 +105,7 @@ public class BookServiceImpl implements BookService {
                 .pageNo(pageNo)
                 .sortBy(sortBy)
                 .VALID_KEY_FIELD(VALID_KEYS)
+                .VALID_FIELD_SEARCH(VALID_KEYWORD_SEARCH)
                 .searchFilters(filter)
                 .build();
         return elasticsearchBaseImpl.search(searchCriteria, BookListResponse.class);

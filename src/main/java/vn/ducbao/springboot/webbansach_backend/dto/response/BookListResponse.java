@@ -21,7 +21,7 @@ public class BookListResponse {
     @Field(type = FieldType.Integer)
     private int idBook;
 
-    @Field(type = FieldType.Text)
+    @Field(type = FieldType.Text, analyzer = "vietnamese_no_tone", searchAnalyzer = "vietnamese_no_tone")
     private String nameBook;
 
     @Field(type = FieldType.Text)

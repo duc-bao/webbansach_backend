@@ -40,7 +40,7 @@ public class ElasticsearchBaseImpl<T> {
             SearchResponse<T> searchResponse = elasticsearchClient.search(searchRequest, responseType);
             return buildPageResponse(searchResponse, searchCriteria);
         } catch (java.io.IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("message", e);
         }
     }
 
@@ -63,9 +63,12 @@ public class ElasticsearchBaseImpl<T> {
         if(StringUtils.hasText(searchCriteria.getKeyword())){
             boolQuery.must(buildMultiMatchQuery(searchCriteria));
         }
-        if(searchCriteria.getSearchFilters() != null){
+        if(searchCriteria.getSearchFilters() != null && searchCriteria.getSearchFilters().length > 0){
             List<SearchFilter> searchFilters = new ArrayList<>();
-            searchFilters.add( handleFilter(searchCriteria.getSearchFilters(), searchCriteria));
+           SearchFilter filter =  handleFilter(searchCriteria.getSearchFilters(), searchCriteria);
+            if(filter != null){
+                searchFilters.add(filter);
+            }
             for(SearchFilter searchFilter : searchFilters){
                 if(searchCriteria.getVALID_KEY_FIELD().contains(searchFilter.getKey())){
                     addFilter(boolQuery, searchFilter);
@@ -114,7 +117,7 @@ public class ElasticsearchBaseImpl<T> {
                 }
             }
         }
-        throw new IllegalArgumentException("No valid search filter found.");
+        return  null;
     }
 
     private FilterOperator converOperator(String operator) {
@@ -150,11 +153,13 @@ public class ElasticsearchBaseImpl<T> {
     }
 
     private Query buildMultiMatchQuery(SearchCriteria searchCriteria) {
-            return MultiMatchQuery.of(m -> m.fields(searchCriteria.getVALID_FIELD_SEARCH())
-                    .query(searchCriteria.getKeyword())
-                    .fuzziness("AUTO")
-                    .operator(Operator.Or)
-            )._toQuery();
+        return MultiMatchQuery.of(m -> m
+                .fields(searchCriteria.getVALID_FIELD_SEARCH())
+                .query(searchCriteria.getKeyword())
+                .operator(Operator.Or)
+                .analyzer("vi_analyzer")
+                .type(TextQueryType.BestFields)
+        )._toQuery();
     }
 
 }
