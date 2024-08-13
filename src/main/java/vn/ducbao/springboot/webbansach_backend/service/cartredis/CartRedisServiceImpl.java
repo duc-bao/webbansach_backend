@@ -3,6 +3,7 @@ package vn.ducbao.springboot.webbansach_backend.service.cartredis;
 import java.util.*;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -44,7 +45,8 @@ public class CartRedisServiceImpl implements CartRedisService {
     long CART_TIME_OUT;
 
     @Override
-    public void addtoCart(int userId, List<CartItemRequest> cartItems) {
+    public CartItemResponse addtoCart(int userId, List<CartItemRequest> cartItems) {
+        CartItemResponse response = new CartItemResponse();
         String fieldKey;
         String userid = String.valueOf(userId);
         User user = userRepository.findById(userId).orElse(null);
@@ -59,16 +61,22 @@ public class CartRedisServiceImpl implements CartRedisService {
             }
             baseRedisService.hashSet(userid, fieldKey, updateQuantity);
 
-            saveAsync(new CartItem(updateQuantity, book, user));
+            CartItem cartItem1 = new CartItem(updateQuantity,book,user);
+            cartItem1 =  cartItemRepository.save(cartItem1);
+            response.setIdProduct(cartItem.getIdBook());
+            response.setQuantity(updateQuantity);
+            response.setIdCart(cartItem1.getIdCart());
         }
 
         baseRedisService.setTimeToLive(userid, CART_TIME_OUT);
+        return response;
     }
 
     @Override
-    public void updateCart(int userId, List<CartItemRequest> cartItems, int cartId) {
+    public ResponseEntity<?> updateCart(int userId, List<CartItemRequest> cartItems, int cartId) {
         String fieldKey;
         String userid = String.valueOf(userId);
+        CartItemResponse response = new CartItemResponse();
         //        List<String> fieldsKey = new ArrayList<>();
         for (CartItemRequest cartItem : cartItems) {
             fieldKey = ID_PRODUCT + cartItem.getIdBook();
@@ -78,10 +86,14 @@ public class CartRedisServiceImpl implements CartRedisService {
             CartItem cartItem1 = cartItemRepository.findById(cartId).orElse(null);
             cartItem1.setQuantity(cartItem.getQuantity());
             cartItemRepository.save(cartItem1);
+            response.setIdProduct(cartItem.getIdBook());
+            response.setQuantity(cartItem.getQuantity());
+            response.setIdCart(cartId);
         }
 
         // baseRedisService.delete(userid, fieldsKey);
         baseRedisService.setTimeToLive(userid, CART_TIME_OUT);
+       return ResponseEntity.ok().build();
     }
 
     @Override
@@ -125,12 +137,12 @@ public class CartRedisServiceImpl implements CartRedisService {
         return cartItemResponses;
     }
 
-    @Async
-    public void saveAsync(CartItem cartItem) {
-        try {
-            cartItemRepository.save(cartItem);
-        } catch (Exception e) {
-            log.error("Cannot Save Item to Database");
-        }
-    }
+//    @Async
+//    public void saveAsync(CartItem cartItem) {
+//        try {
+//            cartItemRepository.save(cartItem);
+//        } catch (Exception e) {
+//            log.error("Cannot Save Item to Database");
+//        }
+//    }
 }

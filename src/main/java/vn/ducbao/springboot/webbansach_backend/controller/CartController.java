@@ -24,8 +24,8 @@ public class CartController {
 
     @PostMapping("/add/{id}")
     public ResponseEntity<?> addCartItem(@PathVariable int id, @RequestBody List<CartItemRequest> cartItemRequest) {
-        cartRedisService.addtoCart(id, cartItemRequest);
-        return ResponseEntity.ok().build();
+
+        return ResponseEntity.ok(cartRedisService.addtoCart(id, cartItemRequest));
     }
 
     @PutMapping("/update/{idcart}/{id}")

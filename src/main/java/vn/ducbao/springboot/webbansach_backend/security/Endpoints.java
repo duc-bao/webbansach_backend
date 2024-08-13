@@ -41,7 +41,8 @@ public class Endpoints {
         "/vnpay/create-payment/**",
         "/api/user/logout",
         "/api/user/refresh-token",
-        "/cart-item/add/*"
+        "/cart-item/add/*",
+            "/vnpay/payment_info/**"
     };
     public static final String[] PUBLIC_DELETE_ENDPOINT = {
         "/cart-items/**", "/favorite-book/delete-book", "/cart-items/delete",
