@@ -82,7 +82,8 @@ public class VnpayController {
     }
 
     @PostMapping("/payment_info")
-    public ResponseEntity<?> paymentSuccess(@RequestBody VNPayRequest vnPayRequest) throws UnsupportedEncodingException {
+    public ResponseEntity<?> paymentSuccess(@RequestBody VNPayRequest vnPayRequest)
+            throws UnsupportedEncodingException {
         // Extract parameters from VNPayRequest
         Map<String, String> params = new LinkedHashMap<>();
         params.put("vnp_Amount", vnPayRequest.getVnp_Amount());
@@ -104,7 +105,8 @@ public class VnpayController {
         for (String fieldName : fieldNames) {
             String fieldValue = params.get(fieldName);
             if (fieldValue != null && !fieldValue.isEmpty()) {
-                hashData.append(fieldName).append('=')
+                hashData.append(fieldName)
+                        .append('=')
                         .append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString()))
                         .append('&');
             }

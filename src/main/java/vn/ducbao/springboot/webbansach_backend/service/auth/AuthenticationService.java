@@ -11,5 +11,5 @@ public interface AuthenticationService {
 
     ResponseEntity<?> refresh(JwtRequest jwtRequest);
 
-//    AuthenticationResponse sosicalogin(String authencode);
+    AuthenticationResponse sosicalogin(String authencode);
 }

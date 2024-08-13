@@ -3,7 +3,6 @@ package vn.ducbao.springboot.webbansach_backend.service.book;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 
 import org.modelmapper.ModelMapper;
@@ -64,14 +63,14 @@ public class BookServiceImpl implements BookService {
     //    @Autowired
     //    private ElasticsearchClient elasticsearchClient;
 
-    @PostConstruct
-    public void syncBooksToElasticsearch() {
-        List<Book> books = bookRepository.findAll();
-        List<BookListResponse> bookListResponses =
-                books.stream().map(this::convertToResponse).collect(Collectors.toList());
-        bookElkRepository.saveAll(bookListResponses);
-        System.out.println("Đã đồng bộ " + bookListResponses.size() + " sách lên Elasticsearch.");
-    }
+    //    @PostConstruct
+    //    public void syncBooksToElasticsearch() {
+    //        List<Book> books = bookRepository.findAll();
+    //        List<BookListResponse> bookListResponses =
+    //                books.stream().map(this::convertToResponse).collect(Collectors.toList());
+    //        bookElkRepository.saveAll(bookListResponses);
+    //        System.out.println("Đã đồng bộ " + bookListResponses.size() + " sách lên Elasticsearch.");
+    //    }
 
     @Autowired
     private ElasticsearchBaseImpl<BookListResponse> elasticsearchBaseImpl;

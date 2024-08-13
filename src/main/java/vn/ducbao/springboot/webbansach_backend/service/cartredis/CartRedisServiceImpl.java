@@ -4,7 +4,6 @@ import java.util.*;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import lombok.AccessLevel;
@@ -61,8 +60,8 @@ public class CartRedisServiceImpl implements CartRedisService {
             }
             baseRedisService.hashSet(userid, fieldKey, updateQuantity);
 
-            CartItem cartItem1 = new CartItem(updateQuantity,book,user);
-            cartItem1 =  cartItemRepository.save(cartItem1);
+            CartItem cartItem1 = new CartItem(updateQuantity, book, user);
+            cartItem1 = cartItemRepository.save(cartItem1);
             response.setIdProduct(cartItem.getIdBook());
             response.setQuantity(updateQuantity);
             response.setIdCart(cartItem1.getIdCart());
@@ -93,7 +92,7 @@ public class CartRedisServiceImpl implements CartRedisService {
 
         // baseRedisService.delete(userid, fieldsKey);
         baseRedisService.setTimeToLive(userid, CART_TIME_OUT);
-       return ResponseEntity.ok().build();
+        return ResponseEntity.ok().build();
     }
 
     @Override
@@ -137,12 +136,12 @@ public class CartRedisServiceImpl implements CartRedisService {
         return cartItemResponses;
     }
 
-//    @Async
-//    public void saveAsync(CartItem cartItem) {
-//        try {
-//            cartItemRepository.save(cartItem);
-//        } catch (Exception e) {
-//            log.error("Cannot Save Item to Database");
-//        }
-//    }
+    //    @Async
+    //    public void saveAsync(CartItem cartItem) {
+    //        try {
+    //            cartItemRepository.save(cartItem);
+    //        } catch (Exception e) {
+    //            log.error("Cannot Save Item to Database");
+    //        }
+    //    }
 }

@@ -2,19 +2,31 @@ package vn.ducbao.springboot.webbansach_backend.entity;
 
 import java.sql.Date;
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import jakarta.persistence.*;
 
-import lombok.Data;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Entity
 @Table(name = "user")
 @EntityListeners(AuditingEntityListener.class)
-public class User {
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+public class User implements UserDetails {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_user")
@@ -58,6 +70,7 @@ public class User {
 
     @Column(name = "activation_code")
     private String activationCode; // Mã kích hoạt
+
     @Column(name = "date_create")
     @CreatedDate
     private LocalDate dateOrder;
@@ -97,4 +110,31 @@ public class User {
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<TranzacsitionInfo> tranzacsitionInfoList;
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return roleList.stream().map(role -> (GrantedAuthority) role).collect(Collectors.toList());
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return false;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return false;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return false;
+    }
+
+    public User(String username, String email, boolean enabled) {
+        this.username = username;
+        this.email = email;
+        this.enabled = enabled;
+
+    }
 }

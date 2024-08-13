@@ -1,6 +1,5 @@
 package vn.ducbao.springboot.webbansach_backend.controller;
 
-import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.slf4j.Slf4j;
 import vn.ducbao.springboot.webbansach_backend.dto.response.PageResponse;
 import vn.ducbao.springboot.webbansach_backend.service.book.BookService;
 
@@ -19,6 +19,7 @@ import vn.ducbao.springboot.webbansach_backend.service.book.BookService;
 @Slf4j
 public class BookController {
     private static final Logger log = LoggerFactory.getLogger(BookController.class);
+
     @Autowired
     private BookService bookService;
 

@@ -5,11 +5,14 @@ import java.util.List;
 import jakarta.persistence.*;
 
 import lombok.Data;
+import org.springframework.security.core.GrantedAuthority;
 
 @Data
 @Entity
 @Table(name = "role")
-public class Role {
+public class Role implements GrantedAuthority {
+
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_role")
@@ -26,4 +29,8 @@ public class Role {
             joinColumns = @JoinColumn(name = "id_role"),
             inverseJoinColumns = @JoinColumn(name = "id_user"))
     List<User> userList;
+    @Override
+    public String getAuthority() {
+        return nameRole;
+    }
 }

@@ -27,7 +27,8 @@ public class Endpoints {
         "/cart-item/get/*",
         "/vnpay/payment_info",
         "/book/all",
-        "/book/search-elk/**"
+        "/book/search-elk/**",
+         "/api/user/**"
     };
     public static final String[] PUBLIC_POST_ENDPOINT = {
         "/user/register",
@@ -42,7 +43,8 @@ public class Endpoints {
         "/api/user/logout",
         "/api/user/refresh-token",
         "/cart-item/add/*",
-            "/vnpay/payment_info/**"
+        "/vnpay/payment_info/**",
+        "/api/user/outbound/**"
     };
     public static final String[] PUBLIC_DELETE_ENDPOINT = {
         "/cart-items/**", "/favorite-book/delete-book", "/cart-items/delete",
