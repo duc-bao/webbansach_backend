@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import vn.ducbao.springboot.webbansach_backend.config.VnpayConfig;
+import vn.ducbao.springboot.webbansach_backend.dto.request.VNPayRequest;
 import vn.ducbao.springboot.webbansach_backend.dto.response.VNPAYResponse;
 
 @RestController
@@ -80,34 +81,32 @@ public class VnpayController {
         return ResponseEntity.status(HttpStatus.OK).body(paymentUrl);
     }
 
-    @GetMapping("/payment_info")
-    public ResponseEntity<?> paymentSuccess(HttpServletRequest request) throws UnsupportedEncodingException {
-        Map fields = new HashMap();
-        for (Enumeration params = request.getParameterNames(); params.hasMoreElements(); ) {
-            String fieldName = (String) params.nextElement();
-            String fieldValue = request.getParameter(fieldName);
-            if ((fieldValue != null) && (fieldValue.length() > 0)) {
-                fields.put(fieldName, fieldValue);
-            }
-        }
-        String vnp_SecureHash = request.getParameter("vnp_SecureHash");
-        if (fields.containsKey("vnp_SecureHashType")) {
-            fields.remove("vnp_SecureHashType");
-        }
-        if (fields.containsKey("vnp_SecureHash")) {
-            fields.remove("vnp_SecureHash");
-        }
-        List<String> fieldNames = new ArrayList<>(fields.keySet());
+    @PostMapping("/payment_info")
+    public ResponseEntity<?> paymentSuccess(@RequestBody VNPayRequest vnPayRequest) throws UnsupportedEncodingException {
+        // Extract parameters from VNPayRequest
+        Map<String, String> params = new LinkedHashMap<>();
+        params.put("vnp_Amount", vnPayRequest.getVnp_Amount());
+        params.put("vnp_BankCode", vnPayRequest.getVnp_BankCode());
+        params.put("vnp_BankTranNo", vnPayRequest.getVnp_BankTranNo());
+        params.put("vnp_CardType", vnPayRequest.getVnp_CardType());
+        params.put("vnp_OrderInfo", vnPayRequest.getVnp_OrderInfo());
+        params.put("vnp_PayDate", vnPayRequest.getVnp_PayDate());
+        params.put("vnp_ResponseCode", vnPayRequest.getVnp_ResponseCode());
+        params.put("vnp_TmnCode", vnPayRequest.getVnp_TmnCode());
+        params.put("vnp_TransactionNo", vnPayRequest.getVnp_TransactionNo());
+        params.put("vnp_TransactionStatus", vnPayRequest.getVnp_TransactionStatus());
+        params.put("vnp_TxnRef", vnPayRequest.getVnp_TxnRef());
+        params.remove("vnp_SecureHash");
+        List<String> fieldNames = new ArrayList<>(params.keySet());
         Collections.sort(fieldNames);
 
         StringBuilder hashData = new StringBuilder();
         for (String fieldName : fieldNames) {
-            String fieldValue = (String) fields.get(fieldName);
-            if ((fieldValue != null) && (fieldValue.length() > 0)) {
-                hashData.append(fieldName);
-                hashData.append('=');
-                hashData.append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString()));
-                hashData.append('&');
+            String fieldValue = params.get(fieldName);
+            if (fieldValue != null && !fieldValue.isEmpty()) {
+                hashData.append(fieldName).append('=')
+                        .append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString()))
+                        .append('&');
             }
         }
 
@@ -118,8 +117,8 @@ public class VnpayController {
 
         String signValue = VnpayConfig.hmacSHA512(VnpayConfig.secretKey, hashData.toString());
 
-        if (signValue.equals(vnp_SecureHash)) {
-            String vnp_ResponseCode = request.getParameter("vnp_ResponseCode");
+        if (signValue.equals(vnPayRequest.getVnp_SecureHash())) {
+            String vnp_ResponseCode = vnPayRequest.getVnp_ResponseCode();
             if ("00".equals(vnp_ResponseCode)) {
                 return ResponseEntity.ok(
                         VNPAYResponse.builder().status("success").build());

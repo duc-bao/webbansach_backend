@@ -1,5 +1,8 @@
 package vn.ducbao.springboot.webbansach_backend.controller;
 
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,7 +16,9 @@ import vn.ducbao.springboot.webbansach_backend.service.book.BookService;
 @RestController
 @RequestMapping("/book")
 @Tag(name = "API BOOk")
+@Slf4j
 public class BookController {
+    private static final Logger log = LoggerFactory.getLogger(BookController.class);
     @Autowired
     private BookService bookService;
 
@@ -24,6 +29,7 @@ public class BookController {
             @RequestParam(required = false, value = "sortBy", defaultValue = "idBook") String sortBy,
             @RequestParam(required = false, value = "keyword") String search,
             @RequestParam(required = false, value = "filter") String[] filter) {
+        log.warn("Đã vào search này ");
         return bookService.searchElk(pageNo, pageSize, sortBy, filter, search);
     }
 
