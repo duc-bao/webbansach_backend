@@ -1,15 +1,19 @@
 package vn.ducbao.springboot.webbansach_backend.entity;
 
 import java.sql.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 import jakarta.persistence.*;
 
 import lombok.Data;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Data
 @Entity
 @Table(name = "user")
+@EntityListeners(AuditingEntityListener.class)
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -54,6 +58,9 @@ public class User {
 
     @Column(name = "activation_code")
     private String activationCode; // Mã kích hoạt
+    @Column(name = "date_create")
+    @CreatedDate
+    private LocalDate dateOrder;
 
     @OneToMany(
             mappedBy = "user",

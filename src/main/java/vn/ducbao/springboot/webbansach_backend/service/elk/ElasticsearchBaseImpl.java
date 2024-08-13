@@ -1,6 +1,7 @@
 package vn.ducbao.springboot.webbansach_backend.service.elk;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -22,6 +23,8 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import vn.ducbao.springboot.webbansach_backend.dto.request.SearchFilter;
 import vn.ducbao.springboot.webbansach_backend.dto.response.PageResponse;
+import vn.ducbao.springboot.webbansach_backend.exception.AppException;
+import vn.ducbao.springboot.webbansach_backend.exception.ErrorCode;
 
 @Service
 @Slf4j
@@ -38,7 +41,7 @@ public class ElasticsearchBaseImpl<T> {
             SearchResponse<T> searchResponse = elasticsearchClient.search(searchRequest, responseType);
             return buildPageResponse(searchResponse, searchCriteria);
         } catch (java.io.IOException e) {
-            throw new RuntimeException("message", e);
+            throw new AppException(ErrorCode.INVALID_KEYORFILTERELK);
         }
     }
 
@@ -71,7 +74,7 @@ public class ElasticsearchBaseImpl<T> {
                 if (searchCriteria.getVALID_KEY_FIELD().contains(searchFilter.getKey())) {
                     addFilter(boolQuery, searchFilter);
                 } else {
-                    throw new IllegalArgumentException("Invalid search filter: " + searchFilter.getKey());
+                    throw new AppException(ErrorCode.INVALID_KEYORFILTERELK);
                 }
             }
         }
@@ -107,10 +110,10 @@ public class ElasticsearchBaseImpl<T> {
                     if (searchCriteria.getVALID_KEY_FIELD().contains(key)) {
                         return new SearchFilter(key, operator, value);
                     } else {
-                        throw new IllegalArgumentException("Invalid search filter: " + searchFilter);
+                        throw new AppException(ErrorCode.INVALID_KEYORFILTERELK);
                     }
                 } else {
-                    throw new IllegalArgumentException("Invalid search filter: " + searchFilter);
+                    throw new AppException(ErrorCode.INVALID_KEYORFILTERELK);
                 }
             }
         }
@@ -130,24 +133,45 @@ public class ElasticsearchBaseImpl<T> {
             case "LIKE":
                 return FilterOperator.LIKE;
             default:
-                throw new IllegalArgumentException("Unsupported operator: " + operator);
+                throw new AppException(ErrorCode.INVALID_OPERATION);
         }
     }
 
     private void addFilter(BoolQuery.Builder boolQuery, SearchFilter searchFilter) {
         Query filterQuery = null;
+        String key = searchFilter.getKey();
         switch (searchFilter.getOperation()) {
             case GREATER_THAN:
-                RangeQuery.of(r -> r.field(searchFilter.getKey()).gte(JsonData.of(searchFilter.getValue())));
+               filterQuery =  RangeQuery.of(r -> r.field(searchFilter.getKey()).gte(JsonData.of(searchFilter.getValue())))._toQuery();
                 break;
             case LESS_THAN:
-                RangeQuery.of(r -> r.field(searchFilter.getKey()).lte(JsonData.of(searchFilter.getValue())));
+              filterQuery =  RangeQuery.of(r -> r.field(searchFilter.getKey()).lte(JsonData.of(searchFilter.getValue())))._toQuery();
                 break;
             case EQUALS:
-                TermQuery.of(td -> td.field(searchFilter.getKey()).value(searchFilter.getValue()));
+                if (key.contains(".")) {
+                    // Tách chuỗi ra và bor vào mảng
+                    String[] parts = key.split("\\.");
+                    String path = parts[0];
+                    // Lấy giá trị sau dấu .
+                    String nestedField = String.join(".", Arrays.copyOfRange(parts, 1, parts.length));
+
+                    filterQuery = NestedQuery.of(n -> n
+                            .path(path)
+                            .query(q -> q
+                                    .bool(b -> b.filter(f -> f.term(
+                                            t ->t.field(key+".keyword").value(searchFilter.getValue())
+                                    )))
+                            )
+                    )._toQuery();
+                } else {
+                    filterQuery = MatchQuery.of(m -> m.field(searchFilter.getKey()).query(searchFilter.getValue()))._toQuery();
+                }
                 break;
             default:
-                throw new IllegalArgumentException("Invalid operation: " + searchFilter.getOperation());
+                throw new AppException(ErrorCode.INVALID_OPERATION);
+        }
+        if (filterQuery != null) {
+            boolQuery.filter(filterQuery);  // Sử dụng filter thay vì must hoặc should tùy theo yêu cầu logic của bạn
         }
     }
 

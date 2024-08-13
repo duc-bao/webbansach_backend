@@ -1,17 +1,22 @@
 package vn.ducbao.springboot.webbansach_backend.entity;
 
 import java.sql.Date;
+import java.time.LocalDate;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 
 import org.springframework.data.annotation.CreatedDate;
 
 import lombok.Data;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Data
 @Entity
 @Table(name = "orders")
+@JsonIgnoreProperties(ignoreUnknown = true)
+@EntityListeners(AuditingEntityListener.class)
 public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,7 +25,7 @@ public class Order {
 
     @Column(name = "date_created")
     @CreatedDate
-    private Date dateOrder;
+    private LocalDate dateOrder;
 
     @Column(name = "purchase_address")
     private String purchaseAddress;

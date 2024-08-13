@@ -2,6 +2,7 @@ package vn.ducbao.springboot.webbansach_backend.entity;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 
 import lombok.Data;
@@ -9,6 +10,7 @@ import lombok.Data;
 @Data
 @Entity
 @Table(name = "book")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Book {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
