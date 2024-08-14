@@ -1,16 +1,15 @@
 package vn.ducbao.springboot.webbansach_backend.controller;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import vn.ducbao.springboot.webbansach_backend.dto.request.JwtRequest;
+import vn.ducbao.springboot.webbansach_backend.dto.response.AuthenticationResponse;
+import vn.ducbao.springboot.webbansach_backend.exception.ApiResponse;
 import vn.ducbao.springboot.webbansach_backend.service.auth.AuthenticationService;
 import vn.ducbao.springboot.webbansach_backend.service.user.UserService;
 
@@ -32,5 +31,11 @@ public class AuthenticationController {
     @PostMapping("/refresh-token")
     public ResponseEntity<?> refreshToken(@RequestBody JwtRequest jwtRequest) {
         return authenticationService.refresh(jwtRequest);
+    }
+
+    @PostMapping("/outbound/authentication")
+    public ApiResponse<AuthenticationResponse> outboundAuthentication(@RequestParam(value = "code") String authencode) {
+        var result = authenticationService.sosicalogin(authencode);
+        return ApiResponse.<AuthenticationResponse>builder().data(result).build();
     }
 }

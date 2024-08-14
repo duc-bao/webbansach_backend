@@ -9,10 +9,11 @@ services:
       MYSQL_PASSWORD: 2904
       MYSQL_ROOT_PASSWORD: 2904
     ports:
-      - 3308:3306
+      - "3308:3306"
+    expose:
+      - 3308
     volumes:
-      - mysql:/var/lib/mysql
-      - D:/backup:/docker-entrypoint-initdb.d
+      - db:/var/lib/mysql
     networks:
       - webbansach
   redis:
@@ -77,5 +78,5 @@ networks:
   webbansach:
     driver: bridge
 volumes:
-  mysql:
+  db:
   redis-data:

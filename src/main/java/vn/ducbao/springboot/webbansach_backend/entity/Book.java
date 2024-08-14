@@ -4,11 +4,14 @@ import java.util.List;
 
 import jakarta.persistence.*;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import lombok.Data;
 
 @Data
 @Entity
 @Table(name = "book")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Book {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
