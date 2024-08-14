@@ -1,13 +1,17 @@
 package vn.ducbao.springboot.webbansach_backend.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.metamodel.Type;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.rest.core.config.RepositoryRestConfiguration;
 import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurer;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 
 @Configuration
@@ -51,5 +55,14 @@ public class MethodRestConfig implements RepositoryRestConfigurer {
                 .forDomainType(c)
                 .withItemExposure(((metdata, httpMethods1) -> httpMethods1.disable(httpMethods)))
                 .withCollectionExposure((metdata, httpMethods1) -> httpMethods1.disable(httpMethods));
+    }
+
+    @Bean
+    RestTemplate restTemplate() {
+        RestTemplate restTemplate = new RestTemplate();
+        MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
+        converter.setObjectMapper(new ObjectMapper());
+        restTemplate.getMessageConverters().add(converter);
+        return restTemplate;
     }
 }

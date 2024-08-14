@@ -142,10 +142,14 @@ public class ElasticsearchBaseImpl<T> {
         String key = searchFilter.getKey();
         switch (searchFilter.getOperation()) {
             case GREATER_THAN:
-               filterQuery =  RangeQuery.of(r -> r.field(searchFilter.getKey()).gte(JsonData.of(searchFilter.getValue())))._toQuery();
+                filterQuery = RangeQuery.of(
+                                r -> r.field(searchFilter.getKey()).gte(JsonData.of(searchFilter.getValue())))
+                        ._toQuery();
                 break;
             case LESS_THAN:
-              filterQuery =  RangeQuery.of(r -> r.field(searchFilter.getKey()).lte(JsonData.of(searchFilter.getValue())))._toQuery();
+                filterQuery = RangeQuery.of(
+                                r -> r.field(searchFilter.getKey()).lte(JsonData.of(searchFilter.getValue())))
+                        ._toQuery();
                 break;
             case EQUALS:
                 if (key.contains(".")) {
@@ -155,23 +159,21 @@ public class ElasticsearchBaseImpl<T> {
                     // Lấy giá trị sau dấu .
                     String nestedField = String.join(".", Arrays.copyOfRange(parts, 1, parts.length));
 
-                    filterQuery = NestedQuery.of(n -> n
-                            .path(path)
-                            .query(q -> q
-                                    .bool(b -> b.filter(f -> f.term(
-                                            t ->t.field(key+".keyword").value(searchFilter.getValue())
-                                    )))
-                            )
-                    )._toQuery();
+                    filterQuery = NestedQuery.of(n -> n.path(path)
+                                    .query(q -> q.bool(b -> b.filter(f -> f.term(
+                                            t -> t.field(key + ".keyword").value(searchFilter.getValue()))))))
+                            ._toQuery();
                 } else {
-                    filterQuery = MatchQuery.of(m -> m.field(searchFilter.getKey()).query(searchFilter.getValue()))._toQuery();
+                    filterQuery = MatchQuery.of(
+                                    m -> m.field(searchFilter.getKey()).query(searchFilter.getValue()))
+                            ._toQuery();
                 }
                 break;
             default:
                 throw new AppException(ErrorCode.INVALID_OPERATION);
         }
         if (filterQuery != null) {
-            boolQuery.filter(filterQuery);  // Sử dụng filter thay vì must hoặc should tùy theo yêu cầu logic của bạn
+            boolQuery.filter(filterQuery); // Sử dụng filter thay vì must hoặc should tùy theo yêu cầu logic của bạn
         }
     }
 

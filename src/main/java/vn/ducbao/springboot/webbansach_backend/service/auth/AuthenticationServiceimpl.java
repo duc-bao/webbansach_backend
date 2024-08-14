@@ -1,18 +1,31 @@
 package vn.ducbao.springboot.webbansach_backend.service.auth;
 
 import java.util.Date;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
+import vn.ducbao.springboot.webbansach_backend.dto.request.ExchangCodeRequest;
 import vn.ducbao.springboot.webbansach_backend.dto.request.JwtRequest;
+import vn.ducbao.springboot.webbansach_backend.dto.response.AuthenticationResponse;
+import vn.ducbao.springboot.webbansach_backend.dto.response.ExchangeTokenResponse;
+import vn.ducbao.springboot.webbansach_backend.dto.response.OutboundUserinfo;
+import vn.ducbao.springboot.webbansach_backend.entity.Role;
+import vn.ducbao.springboot.webbansach_backend.entity.User;
+import vn.ducbao.springboot.webbansach_backend.repository.RoleRepository;
+import vn.ducbao.springboot.webbansach_backend.repository.UserRepository;
 import vn.ducbao.springboot.webbansach_backend.security.JwtResponse;
 import vn.ducbao.springboot.webbansach_backend.service.jwt.JwtService;
 import vn.ducbao.springboot.webbansach_backend.service.redis.BaseRedisService;
@@ -24,10 +37,32 @@ import vn.ducbao.springboot.webbansach_backend.service.redis.BaseRedisService;
 public class AuthenticationServiceimpl implements AuthenticationService {
     JwtService jwtService;
     BaseRedisService baseRedisService;
+    RestTemplate restTemplate;
+    RoleRepository roleRepository;
+    UserRepository userRepository;
 
     @NonFinal
     @Value("${spring.token.prefix}")
     String tokenPrefix;
+
+    @NonFinal
+    @Value("${spring.security.oauth2.client.registration.google.client-id}")
+    String CLIENT_ID;
+
+    @NonFinal
+    @Value("${spring.security.oauth2.client.registration.google.client-secret}")
+    String CLIENT_SECRET;
+
+    @NonFinal
+    @Value("${spring.security.oauth2.client.registration.google.redirect-uri}")
+    String REDIRECT_URI;
+
+    @NonFinal
+    protected final String GRANT_TYPE = "authorization_code";
+    @NonFinal
+    protected final  String URL_EXCHANGE_TOKEN = "https://oauth2.googleapis.com/token";
+    @NonFinal
+    protected final String URL_INFO = "https://www.googleapis.com/oauth2/v1/userinfo";
 
     @Override
     public void logout(JwtRequest jwtRequest) {
@@ -58,5 +93,51 @@ public class AuthenticationServiceimpl implements AuthenticationService {
             e.printStackTrace();
             return ResponseEntity.badRequest().body(e.getMessage());
         }
+    }
+
+    @Override
+    public AuthenticationResponse sosicalogin(String authencode) {
+        var response = getTokenResponse(authencode);
+        log.info("Token response {}", response);
+        var userinfo = getInfoUser("json", response.getBody().getAccessToken());
+//        Role userRole = roleRepository
+//                .findByNameRole("CUSTOMER")
+//                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+        var user = userRepository.findByUsername(userinfo.getBody().getEmail());
+        if (user == null) {
+            userRepository.save(User.builder()
+                    .email(userinfo.getBody().getEmail())
+                    .username(userinfo.getBody().getEmail())
+                    .enabled(userinfo.getBody().isVerifiedEmail())
+                    .build());
+        }
+       Authentication authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+        if(authentication.isAuthenticated()) {
+            String token = jwtService.generateToken(userinfo.getBody().getEmail());
+            return AuthenticationResponse.builder().token(token).build();
+        }
+        return AuthenticationResponse.builder().token("null").build();
+    }
+
+    private ResponseEntity<ExchangeTokenResponse> getTokenResponse(String authencode) {
+        ResponseEntity<ExchangeTokenResponse> response = restTemplate.postForEntity(URL_EXCHANGE_TOKEN,
+                ExchangCodeRequest.builder()
+                        .code(authencode)
+                        .clientId(CLIENT_ID)
+                        .clientSecret(CLIENT_SECRET)
+                        .redirectUri(REDIRECT_URI)
+                        .grantType(GRANT_TYPE)
+                        .build(),ExchangeTokenResponse.class
+        );
+        return response;
+    }
+
+    private ResponseEntity<OutboundUserinfo> getInfoUser(String alt, String accestoken) {
+        String url = UriComponentsBuilder.fromHttpUrl(URL_INFO)
+                .queryParam("alt", alt)
+                .queryParam("access_token", accestoken)
+                .toUriString();
+        ResponseEntity<OutboundUserinfo> response = restTemplate.getForEntity(url, OutboundUserinfo.class);
+        return response;
     }
 }
