@@ -1,8 +1,8 @@
 version: '3.8'
 services:
   mysql:
-    image: mysql:8.0
-    container_name: mysql_book
+    image: mysql:9.0.1
+    container_name: mysql-book
     environment:
       MYSQL_DATABASE: webbansach
       MYSQL_USER: ducbao
@@ -10,8 +10,6 @@ services:
       MYSQL_ROOT_PASSWORD: 2904
     ports:
       - "3308:3306"
-    expose:
-      - 3308
     volumes:
       - db:/var/lib/mysql
     networks:
@@ -30,6 +28,7 @@ services:
     command: redis-server --appendonly yes --requirepass 2904 # Đặt mật khẩu cho Redis và bật tính năng ghi dữ liệu
     networks:
       - webbansach
+
 #  webbansach:
 #    image: webbansach
 #    container_name: webbansach
