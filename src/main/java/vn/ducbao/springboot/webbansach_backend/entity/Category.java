@@ -19,6 +19,8 @@ public class Category {
     //    @Field(type = FieldType.Text)
     private String nameCategory;
 
+    @Column(name = "is_delete")
+    private boolean isDelete;
     @ManyToMany(
             cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH},
             fetch = FetchType.EAGER)

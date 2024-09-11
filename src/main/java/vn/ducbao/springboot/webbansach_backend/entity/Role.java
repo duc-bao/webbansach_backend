@@ -4,15 +4,17 @@ import java.util.List;
 
 import jakarta.persistence.*;
 
-import lombok.Data;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "role")
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class Role implements GrantedAuthority {
-
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_role")

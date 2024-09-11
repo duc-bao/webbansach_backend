@@ -14,6 +14,7 @@ import vn.ducbao.springboot.webbansach_backend.entity.Role;
 import vn.ducbao.springboot.webbansach_backend.entity.User;
 import vn.ducbao.springboot.webbansach_backend.repository.RoleRepository;
 import vn.ducbao.springboot.webbansach_backend.repository.UserRepository;
+import vn.ducbao.springboot.webbansach_backend.security.CustomUserDetail;
 
 @Service
 public class UserSecurityServiceImpl implements UserSecurityService {
@@ -35,7 +36,10 @@ public class UserSecurityServiceImpl implements UserSecurityService {
         if (user == null) {
             throw new UsernameNotFoundException("Tài khoản không tồn tại!");
         }
-
+        if (user.getPassword() == null){
+             CustomUserDetail userDetail1 = new CustomUserDetail(user.getUsername(), user.getAuthorities());
+            return userDetail1;
+        }
         org.springframework.security.core.userdetails.User userDetail =
                 new org.springframework.security.core.userdetails.User(
                         user.getUsername(), user.getPassword(), rolesToAuthorities(user.getRoleList()));

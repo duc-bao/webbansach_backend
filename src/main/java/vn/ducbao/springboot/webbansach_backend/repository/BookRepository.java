@@ -18,5 +18,6 @@ public interface BookRepository extends JpaRepository<Book, Integer> {
     Page<Book> findByNameBookContainingAndCategoryList_IdCategory(
             @RequestParam("name_book") String nameBook, @RequestParam("id_category") int idCategory, Pageable pageable);
 
+    Page<Book> findAllByIsDeletedFalse(Pageable pageable);
     long count();
 }

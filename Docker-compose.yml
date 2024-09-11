@@ -5,8 +5,6 @@ services:
     container_name: mysql_book
     environment:
       MYSQL_DATABASE: webbansach
-      MYSQL_USER: ducbao
-      MYSQL_PASSWORD: 2904
       MYSQL_ROOT_PASSWORD: 2904
     ports:
       - "3308:3306"

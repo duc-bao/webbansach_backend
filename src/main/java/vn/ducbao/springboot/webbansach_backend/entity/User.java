@@ -8,17 +8,14 @@ import java.util.stream.Collectors;
 
 import jakarta.persistence.*;
 
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "user")
 @EntityListeners(AuditingEntityListener.class)

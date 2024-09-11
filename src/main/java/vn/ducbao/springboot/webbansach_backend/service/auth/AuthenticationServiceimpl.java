@@ -1,5 +1,6 @@
 package vn.ducbao.springboot.webbansach_backend.service.auth;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -8,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -104,11 +106,18 @@ public class AuthenticationServiceimpl implements AuthenticationService {
 //                .findByNameRole("CUSTOMER")
 //                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
         var user = userRepository.findByUsername(userinfo.getBody().getEmail());
+        List<Role> roleList = new ArrayList<>();
+        Role customerRole = roleRepository
+                .findByNameRole("CUSTOMER")
+                .orElseThrow(() -> new RuntimeException("Error: CUSTOMER Role is not found."));
+
+        roleList.add(customerRole);
         if (user == null) {
-            userRepository.save(User.builder()
+            user = userRepository.save(User.builder()
                     .email(userinfo.getBody().getEmail())
                     .username(userinfo.getBody().getEmail())
                     .enabled(userinfo.getBody().isVerifiedEmail())
+                    .roleList(roleList)
                     .build());
         }
        Authentication authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());

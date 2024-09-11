@@ -377,7 +377,7 @@ public class BookServiceImpl implements BookService {
     public PageResponse<?> getAll(int pageNo, int pageSize, String sortBy) {
         Sort sort = Sort.by(sortBy);
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
-        Page<Book> books = bookRepository.findAll(pageable);
+        Page<Book> books = bookRepository.findAllByIsDeletedFalse(pageable);
         List<Book> bookList = books.getContent();
         return PageResponse.<Book>builder()
                 .page(books.getTotalPages())

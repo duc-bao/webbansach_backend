@@ -49,6 +49,8 @@ public class Book {
     @Column(name = "discount_percent")
     private double discountPercent;
 
+    @Column(name = "is_delete")
+    private boolean isDelete;
     @ManyToMany(
             fetch = FetchType.EAGER,
             cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
