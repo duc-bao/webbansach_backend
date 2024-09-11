@@ -1,7 +1,6 @@
 package vn.ducbao.springboot.webbansach_backend.service.auth;
 
 import java.util.Date;
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -22,7 +21,6 @@ import vn.ducbao.springboot.webbansach_backend.dto.request.JwtRequest;
 import vn.ducbao.springboot.webbansach_backend.dto.response.AuthenticationResponse;
 import vn.ducbao.springboot.webbansach_backend.dto.response.ExchangeTokenResponse;
 import vn.ducbao.springboot.webbansach_backend.dto.response.OutboundUserinfo;
-import vn.ducbao.springboot.webbansach_backend.entity.Role;
 import vn.ducbao.springboot.webbansach_backend.entity.User;
 import vn.ducbao.springboot.webbansach_backend.repository.RoleRepository;
 import vn.ducbao.springboot.webbansach_backend.repository.UserRepository;
@@ -59,8 +57,10 @@ public class AuthenticationServiceimpl implements AuthenticationService {
 
     @NonFinal
     protected final String GRANT_TYPE = "authorization_code";
+
     @NonFinal
-    protected final  String URL_EXCHANGE_TOKEN = "https://oauth2.googleapis.com/token";
+    protected final String URL_EXCHANGE_TOKEN = "https://oauth2.googleapis.com/token";
+
     @NonFinal
     protected final String URL_INFO = "https://www.googleapis.com/oauth2/v1/userinfo";
 
@@ -100,9 +100,9 @@ public class AuthenticationServiceimpl implements AuthenticationService {
         var response = getTokenResponse(authencode);
         log.info("Token response {}", response);
         var userinfo = getInfoUser("json", response.getBody().getAccessToken());
-//        Role userRole = roleRepository
-//                .findByNameRole("CUSTOMER")
-//                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+        //        Role userRole = roleRepository
+        //                .findByNameRole("CUSTOMER")
+        //                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
         var user = userRepository.findByUsername(userinfo.getBody().getEmail());
         if (user == null) {
             userRepository.save(User.builder()
@@ -111,8 +111,8 @@ public class AuthenticationServiceimpl implements AuthenticationService {
                     .enabled(userinfo.getBody().isVerifiedEmail())
                     .build());
         }
-       Authentication authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
-        if(authentication.isAuthenticated()) {
+        Authentication authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+        if (authentication.isAuthenticated()) {
             String token = jwtService.generateToken(userinfo.getBody().getEmail());
             return AuthenticationResponse.builder().token(token).build();
         }
@@ -120,15 +120,16 @@ public class AuthenticationServiceimpl implements AuthenticationService {
     }
 
     private ResponseEntity<ExchangeTokenResponse> getTokenResponse(String authencode) {
-        ResponseEntity<ExchangeTokenResponse> response = restTemplate.postForEntity(URL_EXCHANGE_TOKEN,
+        ResponseEntity<ExchangeTokenResponse> response = restTemplate.postForEntity(
+                URL_EXCHANGE_TOKEN,
                 ExchangCodeRequest.builder()
                         .code(authencode)
                         .clientId(CLIENT_ID)
                         .clientSecret(CLIENT_SECRET)
                         .redirectUri(REDIRECT_URI)
                         .grantType(GRANT_TYPE)
-                        .build(),ExchangeTokenResponse.class
-        );
+                        .build(),
+                ExchangeTokenResponse.class);
         return response;
     }
 

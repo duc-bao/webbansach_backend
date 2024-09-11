@@ -14,6 +14,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -60,17 +61,16 @@ public class BookServiceImpl implements BookService {
     @Autowired
     private BookElkRepository bookElkRepository;
 
-    //    @Autowired
-    //    private ElasticsearchClient elasticsearchClient;
-
-    //    @PostConstruct
-    //    public void syncBooksToElasticsearch() {
-    //        List<Book> books = bookRepository.findAll();
-    //        List<BookListResponse> bookListResponses =
-    //                books.stream().map(this::convertToResponse).collect(Collectors.toList());
-    //        bookElkRepository.saveAll(bookListResponses);
-    //        System.out.println("Đã đồng bộ " + bookListResponses.size() + " sách lên Elasticsearch.");
-    //    }
+    @Autowired
+    private KafkaTemplate<String, Object> kafkaTemplate;
+    //        @PostConstruct
+    //        public void syncBooksToElasticsearch() {
+    //            List<Book> books = bookRepository.findAll();
+    //            List<BookListResponse> bookListResponses =
+    //                    books.stream().map(this::convertToResponse).collect(Collectors.toList());
+    //            bookElkRepository.saveAll(bookListResponses);
+    //            System.out.println("Đã đồng bộ " + bookListResponses.size() + " sách lên Elasticsearch.");
+    //        }
 
     @Autowired
     private ElasticsearchBaseImpl<BookListResponse> elasticsearchBaseImpl;
@@ -279,7 +279,7 @@ public class BookServiceImpl implements BookService {
             // Cap nhat lai anh
             bookRepository.save(newBook);
             BookListResponse bookListResponse = modelMapper.map(newBook, BookListResponse.class);
-            bookElkRepository.save(bookListResponse);
+            kafkaTemplate.send("async_book", bookListResponse);
             return ResponseEntity.ok("Success!");
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
@@ -303,6 +303,7 @@ public class BookServiceImpl implements BookService {
             book.setCategoryList(categoryList);
             // Kieem tra xem thumbnail co thay doi khong
             String datathumbnail = formatStringByJson(String.valueOf(jsonNode.get("thumbnail")));
+
             if (Base64MuiltipartFileConverter.isBase64(datathumbnail)) {
                 for (Image image : imageList) {
                     if (image.isIcon()) {
@@ -314,17 +315,20 @@ public class BookServiceImpl implements BookService {
                     }
                 }
             }
+
             Book newbook = bookRepository.save(book);
             // Kieemr  tra anhr co lien quan
             List<String> arrDataImage =
                     objectMapper.readValue(jsonNode.get("relateImg").traverse(), new TypeReference<List<String>>() {});
             // Xem có xoá tất ở bên FE không
             boolean isCheckDelete = true;
+
             for (String img : arrDataImage) {
                 if (!Base64MuiltipartFileConverter.isBase64(img)) {
                     isCheckDelete = false;
                 }
             }
+
             // Neu xoa het tat ca
             if (isCheckDelete) {
                 imageRepository.deleteImagesWithFalseThumbnailByBookId(newbook.getIdBook());
@@ -360,7 +364,8 @@ public class BookServiceImpl implements BookService {
             newbook.setImageList(imageList);
             bookRepository.save(newbook);
             BookListResponse bookListResponse = modelMapper.map(newbook, BookListResponse.class);
-            bookElkRepository.save(bookListResponse);
+            //            bookElkRepository.save(bookListResponse);
+            kafkaTemplate.send("async_book", bookListResponse);
             return ResponseEntity.ok("SUCCESS!");
         } catch (Exception e) {
             e.printStackTrace();

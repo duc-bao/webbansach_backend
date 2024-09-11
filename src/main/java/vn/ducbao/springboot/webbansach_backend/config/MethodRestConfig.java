@@ -1,6 +1,5 @@
 package vn.ducbao.springboot.webbansach_backend.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.metamodel.Type;
 
@@ -13,6 +12,8 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Configuration
 public class MethodRestConfig implements RepositoryRestConfigurer {

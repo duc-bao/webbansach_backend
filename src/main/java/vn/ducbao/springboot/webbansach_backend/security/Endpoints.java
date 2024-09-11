@@ -28,7 +28,7 @@ public class Endpoints {
         "/vnpay/payment_info",
         "/book/all",
         "/book/search-elk/**",
-         "/api/user/**"
+        "/api/user/**"
     };
     public static final String[] PUBLIC_POST_ENDPOINT = {
         "/user/register",

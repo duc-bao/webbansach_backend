@@ -10,6 +10,7 @@ import jakarta.transaction.Transactional;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import vn.ducbao.springboot.webbansach_backend.dto.response.NotificationEvent;
 import vn.ducbao.springboot.webbansach_backend.entity.Notification;
 import vn.ducbao.springboot.webbansach_backend.entity.Role;
 import vn.ducbao.springboot.webbansach_backend.entity.User;
@@ -48,6 +50,9 @@ public class UserSeviceImpl implements UserService {
     @Autowired
     private JwtService jwtService;
 
+    @Autowired
+    private KafkaTemplate<String, Object> kafkaTemplate;
+
     private final ObjectMapper objectMapper;
 
     public UserSeviceImpl(ObjectMapper objectMapper) {
@@ -62,6 +67,7 @@ public class UserSeviceImpl implements UserService {
         if (userRepository.existsByEmail((user.getEmail()))) {
             return ResponseEntity.badRequest().body(new Notification("Email đã tồn tại!"));
         }
+
         // Gán và gửi thông tin kích hoạt
         user.setActivationCode(activationCode());
         user.setEnabled(false);
@@ -69,8 +75,22 @@ public class UserSeviceImpl implements UserService {
         String endecodePassword = bCryptPasswordEncoder.encode(user.getPassword());
         System.out.println(user.getUsername());
         user.setPassword(endecodePassword);
+
         userRepository.save(user);
-        sendEmailUser(user.getEmail(), user.getActivationCode());
+        String text = "Vui lòng sử dụng mã sau để kích hoạt cho tài khoản <" + user.getEmail() + ">:<br> <h1>"
+                + user.getUsername() + "</h1>";
+
+        text += "<br>Click Vào đường link để kích hoạt tài khoản:";
+        String url = "http:localhost:3000/active-account/" + user.getEmail() + "/" + user.getActivationCode();
+        text += ("<br><a href = " + url + "> " + url + " </a>");
+
+        NotificationEvent notificationEvent = NotificationEvent.builder()
+                .channel("email")
+                .recipient(user.getEmail())
+                .subject("Kich hoạt tài khoản của bạn tại web bán sách")
+                .body(text)
+                .build();
+        kafkaTemplate.send("email-active", notificationEvent);
         return ResponseEntity.ok("Tạo thành công");
     }
 
@@ -80,15 +100,11 @@ public class UserSeviceImpl implements UserService {
     }
 
     // Gửi email cho người dùng
-    private void sendEmailUser(String email, String activationCode) {
-        String subject = "Kich hoạt tài khoản của bạn tại web bán sách";
-        String text = "Vui lòng sử dụng mã sau để kích hoạt cho tài khoản <" + email + ">:<br> <h1>" + activationCode
-                + "</h1>";
-        text += "<br>Click Vào đường link để kích hoạt tài khoản:";
-        String url = "http:localhost:3000/active-account/" + email + "/" + activationCode;
-        text += ("<br><a href = " + url + "> " + url + " </a>");
-        emailService.sendMessage("truongducbao29042002@gmail.com", email, subject, text);
-    }
+    //    private void sendEmailUser(String email, String activationCode) {
+    //        String subject = "Kich hoạt tài khoản của bạn tại web bán sách";
+    //
+    //        emailService.sendMessage("truongducbao29042002@gmail.com", email, subject, text);
+    //    }
     // Kích hoạt tài khoản người dùng
     public ResponseEntity<?> activeUser(String email, String activationCode) {
         User user = userRepository.findByEmail(email);
@@ -136,7 +152,7 @@ public class UserSeviceImpl implements UserService {
         String text = "Mật khẩu tạm thời của bạn là: <strong>" + passwordTemp + " </strong>";
         text += "<br/>  <span>Vui lòng đăng nhập và đổi lại mật khẩu của bạn</span>";
         try {
-            emailService.sendMessage("truongducbao290402@gmail.com", email, subject, text);
+            emailService.sendMessage("ducbao2904@imail.edu.vn", email, subject, text);
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.badRequest().build();

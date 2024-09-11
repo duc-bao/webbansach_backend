@@ -5,6 +5,8 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
+import vn.ducbao.springboot.webbansach_backend.dto.response.NotificationEvent;
+
 @Service
 public class EmailServiceImpl implements EmailService {
     @Autowired
@@ -12,6 +14,20 @@ public class EmailServiceImpl implements EmailService {
 
     public EmailServiceImpl(JavaMailSender emailSender) {
         this.emailSender = emailSender;
+    }
+
+    @Override
+    public void sendMessage(NotificationEvent notificationEvent) {
+        // MimeMailMessage ==> có đính kèm file
+        // SimpleMailMesage ==> Chi co text
+        SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
+        simpleMailMessage.setFrom("truongducbao290402@gmail.com");
+        simpleMailMessage.setTo(notificationEvent.getRecipient());
+        simpleMailMessage.setSubject(notificationEvent.getSubject());
+        simpleMailMessage.setText(notificationEvent.getBody());
+
+        // thực hiện hành động gửi email
+        emailSender.send(simpleMailMessage);
     }
 
     @Override

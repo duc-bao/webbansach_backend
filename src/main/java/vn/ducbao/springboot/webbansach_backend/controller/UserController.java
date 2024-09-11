@@ -2,6 +2,7 @@ package vn.ducbao.springboot.webbansach_backend.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -11,18 +12,25 @@ import org.springframework.web.bind.annotation.*;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+import lombok.extern.slf4j.Slf4j;
+import vn.ducbao.springboot.webbansach_backend.dto.response.NotificationEvent;
 import vn.ducbao.springboot.webbansach_backend.entity.Notification;
 import vn.ducbao.springboot.webbansach_backend.entity.User;
 import vn.ducbao.springboot.webbansach_backend.security.JwtResponse;
 import vn.ducbao.springboot.webbansach_backend.security.LoginRequest;
+import vn.ducbao.springboot.webbansach_backend.service.email.EmailService;
 import vn.ducbao.springboot.webbansach_backend.service.jwt.JwtService;
 import vn.ducbao.springboot.webbansach_backend.service.user.UserService;
 
 @RestController
 @RequestMapping("/user")
+@Slf4j
 public class UserController {
     @Autowired
     private UserService userSevice;
+
+    @Autowired
+    private EmailService emailService;
 
     @Autowired
     private AuthenticationManager authenticationManager;
@@ -119,6 +127,16 @@ public class UserController {
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @KafkaListener(topics = "email-active")
+    public void listen(NotificationEvent notificationEvent) {
+        try {
+            log.info("Email register success");
+            emailService.sendMessage(notificationEvent);
+        } catch (Exception e) {
+
         }
     }
 }

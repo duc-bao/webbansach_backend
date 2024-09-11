@@ -4,13 +4,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.web.bind.annotation.*;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
+import vn.ducbao.springboot.webbansach_backend.dto.response.BookListResponse;
 import vn.ducbao.springboot.webbansach_backend.dto.response.PageResponse;
+import vn.ducbao.springboot.webbansach_backend.repository.elk.BookElkRepository;
 import vn.ducbao.springboot.webbansach_backend.service.book.BookService;
 
 @RestController
@@ -22,6 +25,9 @@ public class BookController {
 
     @Autowired
     private BookService bookService;
+
+    @Autowired
+    private BookElkRepository bookElkRepository;
 
     @GetMapping("/search-elk")
     public PageResponse<?> searchBook(
@@ -79,5 +85,11 @@ public class BookController {
     @GetMapping("/get-total")
     public long getTotal() {
         return bookService.getTotalBook();
+    }
+
+    @KafkaListener(topics = "async_book")
+    public void listen(BookListResponse bookListResponse) {
+        log.info("đồng bộ dữ liệu lên elk");
+        bookElkRepository.save(bookListResponse);
     }
 }
