@@ -8,6 +8,7 @@ import java.util.*;
 
 import jakarta.servlet.http.HttpServletRequest;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,10 +16,14 @@ import org.springframework.web.bind.annotation.*;
 import vn.ducbao.springboot.webbansach_backend.config.VnpayConfig;
 import vn.ducbao.springboot.webbansach_backend.dto.request.VNPayRequest;
 import vn.ducbao.springboot.webbansach_backend.dto.response.VNPAYResponse;
+import vn.ducbao.springboot.webbansach_backend.entity.TranzacsitionInfo;
+import vn.ducbao.springboot.webbansach_backend.repository.TranzacsitionInfoRepository;
 
 @RestController
 @RequestMapping("/vnpay")
+@RequiredArgsConstructor
 public class VnpayController {
+    private final TranzacsitionInfoRepository tranzacsitionInfoRepository;
     @PostMapping("/create-payment")
     public ResponseEntity<?> createPayment(HttpServletRequest request, @RequestParam("amount") double amountRequest)
             throws UnsupportedEncodingException {
@@ -122,6 +127,10 @@ public class VnpayController {
         if (signValue.equals(vnPayRequest.getVnp_SecureHash())) {
             String vnp_ResponseCode = vnPayRequest.getVnp_ResponseCode();
             if ("00".equals(vnp_ResponseCode)) {
+                TranzacsitionInfo tranzacsitionInfo = TranzacsitionInfo.builder()
+                        .amount(Integer.parseInt(vnPayRequest.getVnp_Amount()))
+                        .build();
+                tranzacsitionInfoRepository.save(tranzacsitionInfo);
                 return ResponseEntity.ok(
                         VNPAYResponse.builder().status("success").build());
             } else {

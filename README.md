@@ -40,6 +40,7 @@
 
 Bước 1.**Cài đặt pluggin**
  Cài đặt plugin ICU (nếu chưa có): *bin/elasticsearch-plugin install analysis-icu*
+
 Bước 2: **Tạo file cấu hình cho chỉ mục Index(BOOK)** :
  ![image](https://github.com/user-attachments/assets/33709265-cb32-467e-94d9-fa9f4615e774)
  #### Giải thích:
@@ -47,6 +48,8 @@ Bước 2: **Tạo file cấu hình cho chỉ mục Index(BOOK)** :
  Và trong code Spring boot thì ta sẽ thực hiện điều này ![image](https://github.com/user-attachments/assets/d0a668b2-0ae1-412d-9200-cde8bb80c303)
  Bước 3:**Run và test cho ra kết quả như hình**:
  ![image](https://github.com/user-attachments/assets/37e242c6-c8bb-4de9-a6fa-4f4f546a0bd3)
+ Bước 4: **Giải thích**
+ - Với tính năng tìm kiếm nâng cao dựa trên bộ Analysis và Analyzers có thể xử lí vơí ngôn ngữ tự nhiên tiếng việt không dấu và có dấu 
 
 
   

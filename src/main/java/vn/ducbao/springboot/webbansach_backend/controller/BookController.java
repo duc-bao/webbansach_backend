@@ -65,7 +65,7 @@ public class BookController {
     public PageResponse<?> getAll(
             @RequestParam(value = "pageSize", defaultValue = "10") int pageSize,
             @RequestParam(value = "pageNo", defaultValue = "0") int pageNo,
-            @RequestParam(value = "sortBy", defaultValue = "id", required = false) String sortBy) {
+            @RequestParam(value = "sortBy", defaultValue = "idBook", required = false) String sortBy) {
         return bookService.getAll(pageNo, pageSize, sortBy);
     }
 

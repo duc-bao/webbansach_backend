@@ -36,8 +36,8 @@ public class UserSecurityServiceImpl implements UserSecurityService {
         if (user == null) {
             throw new UsernameNotFoundException("Tài khoản không tồn tại!");
         }
-        if (user.getPassword() == null){
-             CustomUserDetail userDetail1 = new CustomUserDetail(user.getUsername(), user.getAuthorities());
+        if (user.getPassword() == null) {
+            CustomUserDetail userDetail1 = new CustomUserDetail(user.getUsername(), user.getAuthorities());
             return userDetail1;
         }
         org.springframework.security.core.userdetails.User userDetail =

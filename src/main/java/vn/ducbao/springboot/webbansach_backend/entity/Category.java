@@ -4,9 +4,12 @@ import java.util.List;
 
 import jakarta.persistence.*;
 
-import lombok.Data;
+import lombok.*;
 
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "category")
 public class Category {
@@ -20,7 +23,8 @@ public class Category {
     private String nameCategory;
 
     @Column(name = "is_delete")
-    private boolean isDelete;
+    private Boolean isDelete;
+
     @ManyToMany(
             cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH},
             fetch = FetchType.EAGER)

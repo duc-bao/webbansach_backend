@@ -50,7 +50,7 @@ public class OrderServiceImpl implements OrderService {
             System.out.println("Received JSON: " + jsonNode.toString());
             Order orderData = objectMapper.treeToValue(jsonNode, Order.class);
             orderData.setTotalPrice(orderData.getTotalPriceProduct());
-            orderData.setStatus("Đang xử lí");
+            orderData.setStatus("Đợi xác nhận");
             int idUser = Integer.parseInt(formatStringByJson(String.valueOf(jsonNode.get("idUser"))));
             Optional<User> user = userRepository.findById(idUser);
             orderData.setUser(user.get());
