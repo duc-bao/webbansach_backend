@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 
 import lombok.Builder;
 import lombok.Data;
+import org.springframework.data.annotation.CreatedDate;
 
 @Entity
 @Table(name = "tranzacsiton_info")
@@ -19,6 +20,7 @@ public class TranzacsitionInfo {
     private int amount;
 
     @Column(name = "date_payment")
+    @CreatedDate
     private Date datePayment;
 
     @ManyToOne(

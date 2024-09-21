@@ -3,6 +3,7 @@ package vn.ducbao.springboot.webbansach_backend.service.book;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 
 import org.modelmapper.ModelMapper;
@@ -63,23 +64,24 @@ public class BookServiceImpl implements BookService {
     //    @Autowired
     //    private ElasticsearchClient elasticsearchClient;
 
-    //    @PostConstruct
-    //    public void syncBooksToElasticsearch() {
-    //        List<Book> books = bookRepository.findAll();
-    //        List<BookListResponse> bookListResponses =
-    //                books.stream().map(this::convertToResponse).collect(Collectors.toList());
-    //        bookElkRepository.saveAll(bookListResponses);
-    //        System.out.println("Đã đồng bộ " + bookListResponses.size() + " sách lên Elasticsearch.");
-    //    }
+//        @PostConstruct
+//        public void syncBooksToElasticsearch() {
+//            List<Book> books = bookRepository.findAll();
+//            List<BookListResponse> bookListResponses =
+//                    books.stream().map(this::convertToResponse).collect(Collectors.toList());
+//            bookElkRepository.saveAll(bookListResponses);
+//            System.out.println("Đã đồng bộ " + bookListResponses.size() + " sách lên Elasticsearch.");
+//        }
 
     @Autowired
     private ElasticsearchBaseImpl<BookListResponse> elasticsearchBaseImpl;
 
     private static final Set<String> VALID_KEYS =
             Set.of("nameBook", "author", "sellPrice", "categoryList.nameCategory");
-    private static final List<String> VALID_KEYWORD_SEARCH = Arrays.asList("nameBook");
+    private static final List<String> VALID_KEYWORD_SEARCH = Arrays.asList("nameBook", "description","author");
     public final ObjectMapper objectMapper;
     public final ModelMapper modelMapper;
+    public final List<String> numericFields = Arrays.asList("idBook", "sellPrice", "soldQuantity");
 
     public BookServiceImpl(ObjectMapper objectMapper, ModelMapper modelMapper) {
         this.objectMapper = objectMapper;
@@ -96,6 +98,7 @@ public class BookServiceImpl implements BookService {
                 .sortBy(sortBy)
                 .VALID_KEY_FIELD(VALID_KEYS)
                 .VALID_FIELD_SEARCH(VALID_KEYWORD_SEARCH)
+                .VALID_SORT_NOT_TEXT(numericFields)
                 .searchFilters(filter)
                 .build();
         return elasticsearchBaseImpl.search(searchCriteria, BookListResponse.class);
@@ -377,7 +380,7 @@ public class BookServiceImpl implements BookService {
     public PageResponse<?> getAll(int pageNo, int pageSize, String sortBy) {
         Sort sort = Sort.by(sortBy);
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
-        Page<Book> books = bookRepository.findAllByIsDeletedFalse(pageable);
+        Page<Book> books = bookRepository.findAllByIsDeleteFalse(pageable);
         List<Book> bookList = books.getContent();
         return PageResponse.<Book>builder()
                 .page(books.getTotalPages())

@@ -1,10 +1,9 @@
 package vn.ducbao.springboot.webbansach_backend.security;
 
+import java.util.Collection;
+
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-
-import java.util.Collection;
-import java.util.List;
 
 public class CustomUserDetail implements UserDetails {
     private String username;

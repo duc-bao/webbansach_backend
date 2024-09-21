@@ -6,9 +6,12 @@ import jakarta.persistence.*;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import lombok.Data;
+import lombok.*;
 
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "book")
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -50,7 +53,8 @@ public class Book {
     private double discountPercent;
 
     @Column(name = "is_delete")
-    private boolean isDelete;
+    private Boolean isDelete;
+
     @ManyToMany(
             fetch = FetchType.EAGER,
             cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})

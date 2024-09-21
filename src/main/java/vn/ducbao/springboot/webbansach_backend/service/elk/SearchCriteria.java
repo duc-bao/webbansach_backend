@@ -23,7 +23,7 @@ public class SearchCriteria {
     private int pageSize;
     private Set<String> VALID_KEY_FIELD = new HashSet<String>();
     private List<String> VALID_FIELD_SEARCH = new ArrayList<String>();
-
+    private List<String> VALID_SORT_NOT_TEXT = new ArrayList<>();
     public String getKeyword() {
         return keyword != null ? keyword : "";
     }

@@ -4,8 +4,9 @@ import java.util.List;
 
 import jakarta.persistence.*;
 
-import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
+
+import lombok.*;
 
 @Getter
 @Setter
@@ -31,6 +32,7 @@ public class Role implements GrantedAuthority {
             joinColumns = @JoinColumn(name = "id_role"),
             inverseJoinColumns = @JoinColumn(name = "id_user"))
     List<User> userList;
+
     @Override
     public String getAuthority() {
         return nameRole;

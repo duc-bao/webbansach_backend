@@ -10,9 +10,9 @@ import com.cloudinary.Cloudinary;
 
 @Configuration
 public class CloudinaryConfig {
-    private final String CLOUD_NAME = "dbk09oy6h";
-    private final String API_KEY = "284342617128334";
-    private final String API_SECRET = "QU27UPSU5A8u5vIiYGBl2rl1DwU";
+    private final String CLOUD_NAME = "CLOUD_NAME_YOUR";
+    private final String API_KEY = "CLOUD_API_KEY_YOUR";
+    private final String API_SECRET = "CLOUD_API_SECRET_YOUR";
 
     @Bean
     public Cloudinary cloudinary() {

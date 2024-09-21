@@ -2,6 +2,7 @@ package vn.ducbao.springboot.webbansach_backend.service.user;
 
 import java.sql.Date;
 import java.time.Instant;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -69,8 +70,15 @@ public class UserSeviceImpl implements UserService {
         String endecodePassword = bCryptPasswordEncoder.encode(user.getPassword());
         System.out.println(user.getUsername());
         user.setPassword(endecodePassword);
-        userRepository.save(user);
-        sendEmailUser(user.getEmail(), user.getActivationCode());
+        Role customerRole = roleRepository.findByNameRole("CUSTOMER")
+                .orElseThrow(() -> new RuntimeException("Role CUSTOMER not found"));
+
+        // Set role cho user
+        user.setRoleList(Collections.singletonList(customerRole));
+
+        // Lưu user
+        User savedUser = userRepository.save(user);
+        sendEmailUser(savedUser.getEmail(), user.getActivationCode());
         return ResponseEntity.ok("Tạo thành công");
     }
 
@@ -177,9 +185,12 @@ public class UserSeviceImpl implements UserService {
             String fisrtName = formatStringByJson(String.valueOf(jsonNode.get("firstName")));
             String lastName = formatStringByJson(String.valueOf(jsonNode.get("lastName")));
             // Fomat ngay sinh
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX");
-            Instant instant = Instant.from(formatter.parse(String.valueOf(jsonNode.get("dateOfBirth"))));
-            java.sql.Date dateOfBirth = new java.sql.Date(Date.from(instant).getTime());
+//            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX");
+//            Instant instant = Instant.from(formatter.parse(String.valueOf(jsonNode.get("dateOfBirth"))));
+//            java.sql.Date dateOfBirth = new java.sql.Date(Date.from(instant).getTime());
+            String dateOfBirthStr = jsonNode.get("dateOfBirth").asText();
+            Instant instant = Instant.parse(dateOfBirthStr);
+            java.sql.Date dateOfBirth = java.sql.Date.valueOf(instant.atZone(ZoneId.systemDefault()).toLocalDate());
             String phoneNumber = formatStringByJson(String.valueOf(jsonNode.get("phoneNumber")));
             String deliveryAddress = formatStringByJson(String.valueOf(jsonNode.get("deliveryAddress")));
             String gender = formatStringByJson(String.valueOf(jsonNode.get("gender")));
@@ -209,7 +220,7 @@ public class UserSeviceImpl implements UserService {
             String dataAvatar = formatStringByJson(String.valueOf(jsonNode.get("avatar")));
             Optional<User> user = userRepository.findById(idUser);
             // Xoá đi ảnh trước đó trong cloudinary
-            if (user.get().getAvatar().length() > 0) {
+            if (user.get().getAvatar() != null && user.get().getAvatar().length() > 0) {
                 imageService.deleteImage(user.get().getAvatar());
             }
             if (Base64MuiltipartFileConverter.isBase64(dataAvatar)) {
@@ -219,7 +230,8 @@ public class UserSeviceImpl implements UserService {
             }
             User newUser = userRepository.save(user.get());
             final String jwt = jwtService.generateToken(newUser.getUsername());
-            return ResponseEntity.ok(new JwtResponse(jwt));
+            final String refreshToken = jwtService.generateRefreshToken(newUser.getUsername());
+            return ResponseEntity.ok(new JwtResponse(jwt, refreshToken));
         } catch (Exception e) {
             e.printStackTrace();
             ResponseEntity.badRequest().build();

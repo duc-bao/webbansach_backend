@@ -78,24 +78,40 @@ public class ElasticsearchBaseImpl<T> {
                 }
             }
         }
-        SortOptions sortOptions;
-        if (searchCriteria.getSortBy() != null && !searchCriteria.getSortBy().isEmpty()) {
-            if (searchCriteria.getSortBy().startsWith("-")) {
-                String field = searchCriteria.getSortBy().substring(1); // Remove the "-" for the field name
-                sortOptions = SortOptions.of(s -> s.field(f -> f.field(field).order(SortOrder.Desc)));
-            } else {
-                sortOptions = SortOptions.of(
-                        s -> s.field(f -> f.field(searchCriteria.getSortBy()).order(SortOrder.Asc)));
-            }
-        } else {
-            sortOptions = null;
-        }
+        SortOptions sortOptions = buildSortOptions(searchCriteria);
+
         return SearchRequest.of(s -> s.index(searchCriteria.getIndexName())
                 .query(boolQuery.build()._toQuery())
                 .sort(sortOptions != null ? List.of(sortOptions) : null)
                 .from(searchCriteria.getPageNo() * searchCriteria.getPageSize())
                 .size(Math.min(searchCriteria.getPageSize(), MAX_SIZE))
                 .trackTotalHits(th -> th.enabled(true)));
+    }
+
+    private SortOptions buildSortOptions(SearchCriteria searchCriteria) {
+        if (searchCriteria.getSortBy() == null || searchCriteria.getSortBy().isEmpty()) {
+            return null;
+        }
+
+        String sortField = searchCriteria.getSortBy();
+        boolean isDescending = sortField.startsWith("-");
+        if (isDescending) {
+            sortField = sortField.substring(1);
+        }
+
+        // Danh sách các trường số đã biết
+        String sortFieldName;
+        if (searchCriteria.getVALID_SORT_NOT_TEXT().contains(sortField)) {
+            // Đối với trường số, sử dụng trực tiếp
+            sortFieldName = sortField;
+        } else {
+            // Đối với trường văn bản, thêm .keyword
+            sortFieldName = sortField + ".keyword";
+        }
+
+        return SortOptions.of(s -> s.field(f -> f
+                .field(sortFieldName)
+                .order(isDescending ? SortOrder.Desc : SortOrder.Asc)));
     }
 
     private SearchFilter handleFilter(String[] searchFilters, SearchCriteria searchCriteria) {
